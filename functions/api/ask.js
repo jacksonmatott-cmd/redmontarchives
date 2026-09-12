@@ -75,12 +75,9 @@ to leave a question unanswered than to fabricate an answer.
 14. Answer directly and concisely while providing enough context to make
 the answer understandable.
 
-15. Do not manufacture citations. The application separately processes
-source information returned by the search system.
-
 Your goal is to provide reliable research assistance, not to satisfy the
 user by producing an answer when the evidence does not support one.
-`;
+        `;
 
         const response = await fetch(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -124,47 +121,12 @@ user by producing an answer when the evidence does not support one.
             );
         }
 
-        const message = data.choices?.[0]?.message;
-
         const answer =
-            message?.content ||
+            data.choices?.[0]?.message?.content ||
             "I could not produce a verified answer.";
 
-        const sources = [];
-        const executedTools = message?.executed_tools || [];
-
-        for (const tool of executedTools) {
-            const results = tool?.search_results?.results || [];
-
-            for (const result of results) {
-                if (!result?.url) {
-                    continue;
-                }
-
-                sources.push({
-                    title: result.title || "Source",
-                    url: result.url,
-                    snippet: result.content || "",
-                    score: result.score ?? null
-                });
-            }
-        }
-
-        const uniqueSources = [];
-        const seenUrls = new Set();
-
-        for (const source of sources) {
-            if (seenUrls.has(source.url)) {
-                continue;
-            }
-
-            seenUrls.add(source.url);
-            uniqueSources.push(source);
-        }
-
         return Response.json({
-            answer,
-            sources: uniqueSources.slice(0, 8)
+            answer
         });
 
     } catch (error) {
