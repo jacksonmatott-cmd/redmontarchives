@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Organization | Redmont Archives</title>
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+
+<header>
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
+
+        <nav>
+            <a href="/">Archive</a>
+            <a href="/#categories">Categories</a>
+            <a href="/#about">About</a>
+        </nav>
+
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="container hero-inner">
+
+            <div class="eyebrow">
+                ORGANIZATION DIRECTORY
+            </div>
+
+            <h1>
+                Create an Organization
+            </h1>
+
+            <p>
+                Create a public organization archive on Redmont Archives.
+            </p>
+
+        </div>
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="card">
+
+                <div class="eyebrow">
+                    ORGANIZATION INFORMATION
+                </div>
+
+                <h2>
+                    New Organization
+                </h2>
+
+                <form id="organization-form">
+
+                    <label for="name">
+                        Organization Name
+                    </label>
+
+                    <input
+                        id="name"
+                        name="name"
+                        type="text"
+                        placeholder="Example Organization"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="slug">
+                        Organization Slug
+                    </label>
+
+                    <input
+                        id="slug"
+                        name="slug"
+                        type="text"
+                        placeholder="example-organization"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="description">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Describe this organization..."
+                        rows="6"
+                    ></textarea>
+
+                    <br><br>
+
+                    <button type="submit">
+                        Create Organization
+                    </button>
+
+                </form>
+
+                <div id="result" hidden></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Organization Directory
+        </span>
+
+    </div>
+
+</footer>
+
+</body>
+</html>
