@@ -28,9 +28,7 @@ async function searchRecords() {
             throw new Error(data.error || 'Search failed.');
         }
 
-        showSearchResult(
-            data.answer || 'No answer was returned.'
-        );
+        showSearchResult(data.answer);
 
     } catch (error) {
         console.error('Archive search error:', error);
@@ -69,7 +67,6 @@ function showSearchResult(answer) {
     label.textContent = 'REDMONT ARCHIVES AI';
 
     result.appendChild(label);
-
 
     const answerText = document.createElement('div');
     answerText.className = 'ai-result-text';
