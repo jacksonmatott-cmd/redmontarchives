@@ -29,8 +29,9 @@ quotes, sources, URLs, or citations.
 
 Never present guesses as facts.
 
-For factual questions, use web search when appropriate and prefer primary
-or authoritative sources.
+Use web search for factual research when appropriate.
+
+Prefer primary and authoritative sources.
 
 If important information cannot be verified, say:
 "I could not verify this from reliable sources."
@@ -42,8 +43,8 @@ Clearly distinguish verified information from uncertainty.
 Never claim Redmont Archives contains a record unless that record was
 actually provided to you.
 
-For current or changing information, research it rather than relying only
-on prior knowledge.
+For current information, research it rather than relying only on prior
+knowledge.
 
 It is better to leave a question unanswered than to fabricate an answer.
 
@@ -52,6 +53,7 @@ Keep answers concise, factual, and transparent.
 Do not manufacture citations. The application handles source information
 separately.
 `;
+
         const response = await fetch(
             "https://api.groq.com/openai/v1/chat/completions",
             {
@@ -63,19 +65,23 @@ separately.
                     "Groq-Model-Version": "latest"
                 },
 
-             body: JSON.stringify({
-    model: "groq/compound",
-    messages: [
-        {
-            role: "system",
-            content: systemPrompt
-        },
-        {
-            role: "user",
-            content: question
-        }
-    ]
-})
+                body: JSON.stringify({
+                    model: "groq/compound",
+
+                    messages: [
+                        {
+                            role: "system",
+                            content: systemPrompt
+                        },
+                        {
+                            role: "user",
+                            content: question
+                        }
+                    ]
+                })
+            }
+        );
+
         const data = await response.json();
 
         if (!response.ok) {
@@ -96,11 +102,7 @@ separately.
             message?.content ||
             "I could not produce a verified answer.";
 
-        /*
-         * Extract the actual sources returned by Groq.
-         */
         const sources = [];
-
         const executedTools = message?.executed_tools || [];
 
         for (const tool of executedTools) {
@@ -120,9 +122,6 @@ separately.
             }
         }
 
-        /*
-         * Remove duplicate URLs.
-         */
         const uniqueSources = [];
         const seenUrls = new Set();
 
