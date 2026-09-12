@@ -63,33 +63,19 @@ separately.
                     "Groq-Model-Version": "latest"
                 },
 
-                body: JSON.stringify({
-                    model: "groq/compound",
-
-                    messages: [
-                        {
-                            role: "system",
-                            content: systemPrompt
-                        },
-                        {
-                            role: "user",
-                            content: question
-                        }
-                    ],
-
-                    compound_custom: {
-                        tools: {
-                            enabled_tools: [
-                                "web_search"
-                            ]
-                        }
-                    },
-
-                    citation_options: "disabled"
-                })
-            }
-        );
-
+             body: JSON.stringify({
+    model: "groq/compound",
+    messages: [
+        {
+            role: "system",
+            content: systemPrompt
+        },
+        {
+            role: "user",
+            content: question
+        }
+    ]
+})
         const data = await response.json();
 
         if (!response.ok) {
