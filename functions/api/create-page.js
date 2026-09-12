@@ -6,6 +6,7 @@ export async function onRequestPost(context) {
         const title = body.title?.trim();
         const slug = body.slug?.trim().toLowerCase();
         const content = body.content?.trim();
+        const status = body.status?.trim().toLowerCase() || "draft";
 
         if (
             !Number.isInteger(organizationId) ||
@@ -17,6 +18,15 @@ export async function onRequestPost(context) {
             return Response.json(
                 {
                     error: "Organization ID, title, slug, and content are required."
+                },
+                { status: 400 }
+            );
+        }
+
+        if (status !== "draft" && status !== "published") {
+            return Response.json(
+                {
+                    error: "Status must be either draft or published."
                 },
                 { status: 400 }
             );
@@ -79,13 +89,14 @@ export async function onRequestPost(context) {
                     content,
                     status
                 )
-                VALUES (?, ?, ?, ?, 'published')
+                VALUES (?, ?, ?, ?, ?)
             `)
             .bind(
                 organizationId,
                 title,
                 slug,
-                content
+                content,
+                status
             )
             .run();
 
@@ -98,7 +109,7 @@ export async function onRequestPost(context) {
                 title,
                 slug,
                 content,
-                status: "published"
+                status
             }
         });
 
