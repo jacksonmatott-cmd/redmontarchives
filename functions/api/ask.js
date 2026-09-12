@@ -10,47 +10,39 @@ export async function onRequestPost(context) {
             );
         }
 
-        const apiKey = context.env.GEMINI_API_KEY;
+        const apiKey = context.env.GROQ_API_KEY;
 
         if (!apiKey) {
             return Response.json(
-                { error: "Gemini API key is not configured." },
+                { error: "Groq API key is not configured." },
                 { status: 500 }
             );
         }
 
         const response = await fetch(
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+            "https://api.groq.com/openai/v1/chat/completions",
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-goog-api-key": apiKey
+                    "Authorization": `Bearer ${apiKey}`
                 },
                 body: JSON.stringify({
-                    contents: [
+                    model: "openai/gpt-oss-120b",
+                    messages: [
                         {
-                            parts: [
-                                {
-                                    text: `You are the AI research assistant for Redmont Archives.
+                            role: "system",
+                            content: `You are the AI research assistant for Redmont Archives.
 
 Redmont Archives is a public community archive focused on preserving and explaining records, events, organizations, laws, government activity, businesses, and other notable information.
 
-Answer the user's question accurately and clearly.
+Answer questions accurately and clearly.
 
-When information may have changed or when the question asks about something on the internet, use Google Search to find current sources.
-
-Distinguish clearly between established facts and uncertain information.
-
-User question:
-${question}`
-                                }
-                            ]
-                        }
-                    ],
-                    tools: [
+Distinguish between established facts and uncertain information.`
+                        },
                         {
-                            google_search: {}
+                            role: "user",
+                            content: question
                         }
                     ]
                 })
@@ -60,11 +52,11 @@ ${question}`
         const data = await response.json();
 
         if (!response.ok) {
-            console.error("Gemini API error:", data);
+            console.error("Groq API error:", data);
 
             return Response.json(
                 {
-                    error: "Gemini API request failed.",
+                    error: "Groq API request failed.",
                     details: data.error?.message || "Unknown error"
                 },
                 { status: 500 }
@@ -72,16 +64,11 @@ ${question}`
         }
 
         const answer =
-            data.candidates?.[0]?.content?.parts
-                ?.map(part => part.text || "")
-                .join("") || "I couldn't generate an answer.";
-
-        const groundingMetadata =
-            data.candidates?.[0]?.groundingMetadata || null;
+            data.choices?.[0]?.message?.content ||
+            "I couldn't generate an answer.";
 
         return Response.json({
-            answer,
-            groundingMetadata
+            answer
         });
 
     } catch (error) {
@@ -94,4 +81,4 @@ ${question}`
             { status: 500 }
         );
     }
-}   
+}
