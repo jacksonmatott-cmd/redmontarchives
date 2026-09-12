@@ -1,166 +1,117 @@
+export async function onRequestGet(context) {
+    const slug = context.params.slug;
+
+    try {
+        const organization = await context.env.DB
+            .prepare(`
+                SELECT id, name, slug, description, created_at
+                FROM organizations
+                WHERE slug = ?
+            `)
+            .bind(slug)
+            .first();
+
+        if (!organization) {
+            return new Response(
+                "<h1>Organization not found</h1><p>This organization does not exist in Redmont Archives.</p>",
+                {
+                    status: 404,
+                    headers: {
+                        "Content-Type": "text/html; charset=UTF-8"
+                    }
+                }
+            );
+        }
+
+        const pages = await context.env.DB
+            .prepare(`
+                SELECT id, title, slug, content, created_at, updated_at
+                FROM pages
+                WHERE organization_id = ?
+                  AND status = 'published'
+                ORDER BY title ASC
+            `)
+            .bind(organization.id)
+            .all();
+
+        const pageHTML = pages.results.map(page => `
+            <article>
+                <h2>${escapeHTML(page.title)}</h2>
+                <p>${escapeHTML(page.content)}</p>
+            </article>
+        `).join("");
+
+        const html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Organization | Redmont Archives</title>
-
-    <link rel="stylesheet" href="../styles.css">
+    <title>${escapeHTML(organization.name)} | Redmont Archives</title>
 </head>
 
 <body>
 
-<header>
-    <div class="container nav">
-        <a class="brand" href="/">
-            <span class="mark">RA</span>
-            <span>Redmont Archives</span>
-        </a>
+    <header>
+        <h1>Redmont Archives</h1>
+        <a href="/">← Return to Archive</a>
+    </header>
 
-        <nav>
-            <a href="/">Archive</a>
-            <a href="/#categories">Categories</a>
-        </nav>
-    </div>
-</header>
+    <main>
 
-<main>
+        <p>ORGANIZATION ARCHIVE</p>
 
-    <section class="section">
-        <div class="container">
+        <h1>${escapeHTML(organization.name)}</h1>
 
-            <div id="organization">
-                <p>Loading organization...</p>
-            </div>
+        <p>
+            ${escapeHTML(
+                organization.description ||
+                "No organization description has been published."
+            )}
+        </p>
 
-        </div>
-    </section>
+        <hr>
 
-</main>
+        <h2>Published Information</h2>
 
-<footer>
-    <div class="container foot">
-        <span>© 2026 Redmont Archives</span>
-        <span>Organization Archive</span>
-    </div>
-</footer>
-
-<script>
-async function loadOrganization() {
-
-    const slug = window.location.pathname
-        .split('/')
-        .filter(Boolean)
-        .pop();
-
-    try {
-
-        const response = await fetch('/api/organizations');
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-            throw new Error('Could not load organizations.');
+        ${
+            pageHTML ||
+            "<p>No published pages are available yet.</p>"
         }
 
-        const organization = data.organizations.find(
-            item => item.slug === slug
-        );
+    </main>
 
-        if (!organization) {
-            document.getElementById('organization').innerHTML = `
-                <div class="eyebrow">ORGANIZATION</div>
-                <h1>Organization not found</h1>
-                <p>
-                    The organization you are looking for could not be found
-                    in the Redmont Archives.
-                </p>
-                <a href="/">← Return to archive</a>
-            `;
-
-            return;
-        }
-
-        const pagesResponse = await fetch(
-            `/api/organizations/${organization.id}/pages`
-        );
-
-        const pagesData = await pagesResponse.json();
-
-        if (!pagesResponse.ok || !pagesData.success) {
-            throw new Error('Could not load organization pages.');
-        }
-
-        let pagesHTML = '';
-
-        if (pagesData.pages.length === 0) {
-
-            pagesHTML = `
-                <p>No published pages are available yet.</p>
-            `;
-
-        } else {
-
-            pagesHTML = pagesData.pages.map(page => `
-                <article class="card">
-                    <b>ORGANIZATION PAGE</b>
-                    <h3>${escapeHTML(page.title)}</h3>
-                    <p>${escapeHTML(page.content)}</p>
-                </article>
-            `).join('');
-        }
-
-        document.title =
-            `${organization.name} | Redmont Archives`;
-
-        document.getElementById('organization').innerHTML = `
-            <div class="eyebrow">ORGANIZATION ARCHIVE</div>
-
-            <h1>${escapeHTML(organization.name)}</h1>
-
-            <p>
-                ${escapeHTML(
-                    organization.description ||
-                    'No organization description has been published.'
-                )}
-            </p>
-
-            <br>
-
-            <div class="eyebrow">PUBLISHED INFORMATION</div>
-
-            <div class="grid">
-                ${pagesHTML}
-            </div>
+</body>
+</html>
         `;
+
+        return new Response(html, {
+            headers: {
+                "Content-Type": "text/html; charset=UTF-8"
+            }
+        });
 
     } catch (error) {
 
         console.error(error);
 
-        document.getElementById('organization').innerHTML = `
-            <div class="eyebrow">ERROR</div>
-            <h1>Unable to load organization</h1>
-            <p>
-                Please try again later.
-            </p>
-        `;
+        return new Response(
+            "<h1>Server Error</h1><p>Unable to load this organization.</p>",
+            {
+                status: 500,
+                headers: {
+                    "Content-Type": "text/html; charset=UTF-8"
+                }
+            }
+        );
     }
 }
 
 function escapeHTML(value) {
-
     return String(value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
-
-loadOrganization();
-</script>
-
-</body>
-</html>
