@@ -6,6 +6,24 @@ async function searchRecords() {
         return;
     }
 
+    // Check for the hidden record creation command
+    if (query.toLowerCase().startsWith('?create ')) {
+        const parts = query.substring(8).trim().split(/\s+/);
+
+        if (parts.length < 2) {
+            showSearchResult(
+                'Create format: ?create (page title) (category)'
+            );
+            return;
+        }
+
+        const category = parts.pop();
+        const title = parts.join(' ');
+
+        showCreateRecord(title, category);
+        return;
+    }
+
     const button = document.querySelector('.search button');
 
     // Change button while searching
