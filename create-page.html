@@ -66,16 +66,18 @@
                 <form id="page-form">
 
                     <label for="organization-id">
-                        Organization ID
+                        Organization
                     </label>
 
-                    <input
+                    <select
                         id="organization-id"
                         name="organization-id"
-                        type="number"
-                        placeholder="Example: 3"
                         required
                     >
+                        <option value="">
+                            Loading organizations...
+                        </option>
+                    </select>
 
                     <br><br>
 
@@ -157,21 +159,65 @@
 const form = document.getElementById("page-form");
 const result = document.getElementById("result");
 const button = document.getElementById("create-button");
+const organizationSelect = document.getElementById("organization-id");
+
+async function loadOrganizations() {
+    try {
+        const response = await fetch("/api/organizations");
+
+        if (!response.ok) {
+            throw new Error("Unable to load organizations.");
+        }
+
+        const data = await response.json();
+
+        organizationSelect.innerHTML = "";
+
+        if (!data.organizations || data.organizations.length === 0) {
+            organizationSelect.innerHTML = `
+                <option value="">
+                    No organizations available
+                </option>
+            `;
+            return;
+        }
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select an organization...";
+        placeholder.disabled = true;
+        placeholder.selected = true;
+
+        organizationSelect.appendChild(placeholder);
+
+        data.organizations.forEach(organization => {
+            const option = document.createElement("option");
+
+            option.value = organization.id;
+            option.textContent = organization.name;
+
+            organizationSelect.appendChild(option);
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        organizationSelect.innerHTML = `
+            <option value="">
+                Unable to load organizations
+            </option>
+        `;
+    }
+}
 
 form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const organizationId =
-        document.getElementById("organization-id").value;
-
-    const title =
-        document.getElementById("title").value.trim();
-
-    const slug =
-        document.getElementById("slug").value.trim();
-
-    const content =
-        document.getElementById("content").value.trim();
+    const organizationId = organizationSelect.value;
+    const title = document.getElementById("title").value.trim();
+    const slug = document.getElementById("slug").value.trim();
+    const content = document.getElementById("content").value.trim();
 
     button.disabled = true;
     button.textContent = "Creating...";
@@ -215,20 +261,12 @@ form.addEventListener("submit", async function (event) {
             <p>
                 Your page has been published to the organization archive.
             </p>
-
-            <p>
-                <a href="/organizations/${encodeURIComponent(
-                    data.page.organization_id === 3
-                        ? "redmont-test"
-                        : ""
-                )}">
-                    Return to organization archive →
-                </a>
-            </p>
         `;
 
         result.hidden = false;
         form.reset();
+
+        await loadOrganizations();
 
     } catch (error) {
 
@@ -262,6 +300,8 @@ function escapeHTML(value) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+loadOrganizations();
 </script>
 
 </body>
