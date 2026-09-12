@@ -13,7 +13,42 @@ export async function onRequestGet(context) {
 
         if (!organization) {
             return new Response(
-                "<h1>Organization not found</h1><p>This organization does not exist in Redmont Archives.</p>",
+                `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Organization Not Found | Redmont Archives</title>
+                    <link rel="stylesheet" href="/styles.css">
+                </head>
+                <body>
+                    <header>
+                        <div class="container nav">
+                            <a class="brand" href="/">
+                                <span class="mark">RA</span>
+                                <span>Redmont Archives</span>
+                            </a>
+                        </div>
+                    </header>
+
+                    <main>
+                        <section class="section">
+                            <div class="container">
+                                <div class="eyebrow">ORGANIZATION</div>
+                                <h1>Organization not found</h1>
+                                <p>
+                                    The organization you're looking for could not
+                                    be found in the Redmont Archives.
+                                </p>
+                                <br>
+                                <a href="/">← Return to archive</a>
+                            </div>
+                        </section>
+                    </main>
+                </body>
+                </html>
+                `,
                 {
                     status: 404,
                     headers: {
@@ -25,7 +60,13 @@ export async function onRequestGet(context) {
 
         const pages = await context.env.DB
             .prepare(`
-                SELECT id, title, slug, content, created_at, updated_at
+                SELECT
+                    id,
+                    title,
+                    slug,
+                    content,
+                    created_at,
+                    updated_at
                 FROM pages
                 WHERE organization_id = ?
                   AND status = 'published'
@@ -35,8 +76,9 @@ export async function onRequestGet(context) {
             .all();
 
         const pageHTML = pages.results.map(page => `
-            <article>
-                <h2>${escapeHTML(page.title)}</h2>
+            <article class="card">
+                <b>ORGANIZATION PAGE</b>
+                <h3>${escapeHTML(page.title)}</h3>
                 <p>${escapeHTML(page.content)}</p>
             </article>
         `).join("");
@@ -44,42 +86,141 @@ export async function onRequestGet(context) {
         const html = `
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>${escapeHTML(organization.name)} | Redmont Archives</title>
+
+    <meta
+        name="description"
+        content="${escapeHTML(
+            organization.description ||
+            "Organization archive on Redmont Archives."
+        )}"
+    >
+
+    <link rel="stylesheet" href="/styles.css">
 </head>
 
 <body>
 
-    <header>
-        <h1>Redmont Archives</h1>
-        <a href="/">← Return to Archive</a>
-    </header>
+<header>
+    <div class="container nav">
 
-    <main>
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
 
-        <p>ORGANIZATION ARCHIVE</p>
+        <nav>
+            <a href="/">Archive</a>
+            <a href="/#categories">Categories</a>
+            <a href="/#about">About</a>
+        </nav>
 
-        <h1>${escapeHTML(organization.name)}</h1>
+    </div>
+</header>
 
-        <p>
-            ${escapeHTML(
-                organization.description ||
-                "No organization description has been published."
-            )}
-        </p>
+<main>
 
-        <hr>
+    <section class="hero">
+        <div class="container hero-inner">
 
-        <h2>Published Information</h2>
+            <div class="eyebrow">
+                ORGANIZATION ARCHIVE
+            </div>
 
-        ${
-            pageHTML ||
-            "<p>No published pages are available yet.</p>"
-        }
+            <h1>
+                ${escapeHTML(organization.name)}
+            </h1>
 
-    </main>
+            <p>
+                ${escapeHTML(
+                    organization.description ||
+                    "No organization description has been published."
+                )}
+            </p>
+
+        </div>
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="heading">
+
+                <div>
+                    <div class="eyebrow">
+                        PUBLISHED INFORMATION
+                    </div>
+
+                    <h2>
+                        Organization records
+                    </h2>
+                </div>
+
+                <span>
+                    ${pages.results.length}
+                    ${pages.results.length === 1 ? "page" : "pages"}
+                </span>
+
+            </div>
+
+            ${
+                pageHTML
+                    ? `<div class="grid">${pageHTML}</div>`
+                    : `
+                        <div class="none">
+                            No published information is available yet.
+                        </div>
+                    `
+            }
+
+        </div>
+
+    </section>
+
+    <section class="section alt">
+
+        <div class="container">
+
+            <div class="eyebrow">
+                REDMONT ARCHIVES
+            </div>
+
+            <h2>
+                Organization information
+            </h2>
+
+            <p>
+                Information published here represents the organization's
+                public archive within Redmont Archives.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Organization Archive
+        </span>
+
+    </div>
+
+</footer>
 
 </body>
 </html>
@@ -96,7 +237,56 @@ export async function onRequestGet(context) {
         console.error(error);
 
         return new Response(
-            "<h1>Server Error</h1><p>Unable to load this organization.</p>",
+            `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Error | Redmont Archives</title>
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+
+            <body>
+
+                <header>
+                    <div class="container nav">
+                        <a class="brand" href="/">
+                            <span class="mark">RA</span>
+                            <span>Redmont Archives</span>
+                        </a>
+                    </div>
+                </header>
+
+                <main>
+                    <section class="section">
+                        <div class="container">
+
+                            <div class="eyebrow">
+                                ERROR
+                            </div>
+
+                            <h1>
+                                Unable to load organization
+                            </h1>
+
+                            <p>
+                                Please try again later.
+                            </p>
+
+                            <br>
+
+                            <a href="/">
+                                ← Return to archive
+                            </a>
+
+                        </div>
+                    </section>
+                </main>
+
+            </body>
+            </html>
+            `,
             {
                 status: 500,
                 headers: {
