@@ -8,6 +8,7 @@ async function searchRecords() {
 
     const button = document.querySelector('.search button');
 
+    // Change button while searching
     button.disabled = true;
     button.textContent = 'Searching...';
 
@@ -28,15 +29,14 @@ async function searchRecords() {
             throw new Error(data.error || 'Search failed.');
         }
 
+        // Show the AI answer
         showSearchResult(data.answer);
 
     } catch (error) {
-        console.error('Archive search error:', error);
-
+        console.error(error);
         showSearchResult(
             'Sorry, the archive search encountered an error. Please try again.'
         );
-
     } finally {
         button.disabled = false;
         button.textContent = 'Search';
@@ -47,66 +47,39 @@ async function searchRecords() {
 function showSearchResult(answer) {
     let result = document.getElementById('ai-result');
 
+    // Create the result box if it doesn't exist yet
     if (!result) {
         result = document.createElement('div');
         result.id = 'ai-result';
         result.className = 'ai-result';
 
         const searchBox = document.querySelector('.search');
-
         searchBox.parentNode.insertBefore(
             result,
             searchBox.nextElementSibling
         );
     }
 
-    result.replaceChildren();
-
-    const label = document.createElement('div');
-    label.className = 'ai-result-label';
-    label.textContent = 'REDMONT ARCHIVES AI';
-
-    result.appendChild(label);
-
-    const answerText = document.createElement('div');
-    answerText.className = 'ai-result-text';
-
-    const paragraphs = String(answer).split(/\n\s*\n/);
-
-    for (const paragraph of paragraphs) {
-        const p = document.createElement('p');
-
-        const lines = paragraph.split('\n');
-
-        lines.forEach((line, index) => {
-            p.appendChild(
-                document.createTextNode(line)
-            );
-
-            if (index < lines.length - 1) {
-                p.appendChild(document.createElement('br'));
-            }
-        });
-
-        answerText.appendChild(p);
-    }
-
-    result.appendChild(answerText);
+    result.innerHTML = `
+        <div class="ai-result-label">REDMONT ARCHIVES AI</div>
+        <div class="ai-result-text">${formatAnswer(answer)}</div>
+    `;
 
     result.hidden = false;
-
-    result.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-    });
 }
 
 
-document.getElementById('q').addEventListener(
-    'keydown',
-    function (event) {
-        if (event.key === 'Enter') {
-            searchRecords();
-        }
+function formatAnswer(text) {
+    // Basic formatting for line breaks
+    return text
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+}
+
+
+// Press Enter to search
+document.getElementById('q').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        searchRecords();
     }
-);
+});
