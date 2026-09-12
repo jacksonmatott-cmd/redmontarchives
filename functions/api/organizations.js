@@ -14,12 +14,12 @@ export async function onRequestGet(context) {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("Organizations API error:", error);
 
         return Response.json(
             {
                 success: false,
-                error: error.message
+                error: "Could not load organizations."
             },
             { status: 500 }
         );
