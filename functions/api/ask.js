@@ -112,13 +112,14 @@ user by producing an answer when the evidence does not support one.
         if (!response.ok) {
             console.error("Groq API error:", data);
 
-            return Response.json(
-                {
-                    error: "Groq API request failed.",
-                    details: data.error?.message || "Unknown error"
-                },
-                { status: 500 }
-            );
+           return Response.json(
+    {
+        error: "Groq API request failed.",
+        details: data.error?.message || "Unknown error",
+        groq_status: response.status
+    },
+    { status: response.status }
+); 
         }
 
         const answer =
