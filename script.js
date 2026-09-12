@@ -70,6 +70,9 @@ function showSearchResult(answer) {
 
 
 function formatAnswer(text) {
+    // Remove Groq citation markers
+    text = text.replace(/【\d+(?:†[^】]*)?】/g, '');
+
     // Basic formatting for line breaks
     return text
         .replace(/\n\n/g, '<br><br>')
