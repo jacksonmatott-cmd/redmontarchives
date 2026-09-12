@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Organization Page | Redmont Archives</title>
+
+    <link rel="stylesheet" href="/styles.css">
+</head>
+
+<body>
+
+<header>
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
+
+        <nav>
+            <a href="/">Archive</a>
+            <a href="/#categories">Categories</a>
+            <a href="/#about">About</a>
+        </nav>
+
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="container hero-inner">
+
+            <div class="eyebrow">
+                ORGANIZATION ARCHIVE
+            </div>
+
+            <h1>
+                Create a Page
+            </h1>
+
+            <p>
+                Publish information as part of an organization's public archive.
+            </p>
+
+        </div>
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="card">
+
+                <div class="eyebrow">
+                    PAGE INFORMATION
+                </div>
+
+                <h2>
+                    New Organization Page
+                </h2>
+
+                <form id="page-form">
+
+                    <label for="organization-id">
+                        Organization ID
+                    </label>
+
+                    <input
+                        id="organization-id"
+                        name="organization-id"
+                        type="number"
+                        placeholder="Example: 3"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="title">
+                        Page Title
+                    </label>
+
+                    <input
+                        id="title"
+                        name="title"
+                        type="text"
+                        placeholder="About the Organization"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="slug">
+                        Page Slug
+                    </label>
+
+                    <input
+                        id="slug"
+                        name="slug"
+                        type="text"
+                        placeholder="about"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="content">
+                        Page Content
+                    </label>
+
+                    <textarea
+                        id="content"
+                        name="content"
+                        rows="10"
+                        placeholder="Enter the information you want to publish..."
+                        required
+                    ></textarea>
+
+                    <br><br>
+
+                    <button type="submit">
+                        Create Page
+                    </button>
+
+                </form>
+
+                <div id="result" hidden></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Organization Archive
+        </span>
+
+    </div>
+
+</footer>
+
+</body>
+</html>
