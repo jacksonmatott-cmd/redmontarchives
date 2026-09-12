@@ -43,7 +43,7 @@
             </h1>
 
             <p>
-                Publish information as part of an organization's public archive.
+                Publish or save information as part of an organization's archive.
             </p>
 
         </div>
@@ -123,6 +123,26 @@
 
                     <br><br>
 
+                    <label for="status">
+                        Page Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        required
+                    >
+                        <option value="draft">
+                            Draft
+                        </option>
+
+                        <option value="published">
+                            Published
+                        </option>
+                    </select>
+
+                    <br><br>
+
                     <button type="submit" id="create-button">
                         Create Page
                     </button>
@@ -162,7 +182,9 @@ const button = document.getElementById("create-button");
 const organizationSelect = document.getElementById("organization-id");
 
 async function loadOrganizations() {
+
     try {
+
         const response = await fetch("/api/organizations");
 
         if (!response.ok) {
@@ -174,15 +196,18 @@ async function loadOrganizations() {
         organizationSelect.innerHTML = "";
 
         if (!data.organizations || data.organizations.length === 0) {
+
             organizationSelect.innerHTML = `
                 <option value="">
                     No organizations available
                 </option>
             `;
+
             return;
         }
 
         const placeholder = document.createElement("option");
+
         placeholder.value = "";
         placeholder.textContent = "Select an organization...";
         placeholder.disabled = true;
@@ -191,12 +216,14 @@ async function loadOrganizations() {
         organizationSelect.appendChild(placeholder);
 
         data.organizations.forEach(organization => {
+
             const option = document.createElement("option");
 
             option.value = organization.id;
             option.textContent = organization.name;
 
             organizationSelect.appendChild(option);
+
         });
 
     } catch (error) {
@@ -208,16 +235,27 @@ async function loadOrganizations() {
                 Unable to load organizations
             </option>
         `;
+
     }
 }
 
 form.addEventListener("submit", async function (event) {
+
     event.preventDefault();
 
     const organizationId = organizationSelect.value;
-    const title = document.getElementById("title").value.trim();
-    const slug = document.getElementById("slug").value.trim();
-    const content = document.getElementById("content").value.trim();
+
+    const title =
+        document.getElementById("title").value.trim();
+
+    const slug =
+        document.getElementById("slug").value.trim();
+
+    const content =
+        document.getElementById("content").value.trim();
+
+    const status =
+        document.getElementById("status").value;
 
     button.disabled = true;
     button.textContent = "Creating...";
@@ -226,26 +264,39 @@ form.addEventListener("submit", async function (event) {
     result.innerHTML = "";
 
     try {
+
         const response = await fetch("/api/create-page", {
+
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json"
             },
+
             body: JSON.stringify({
                 organization_id: organizationId,
                 title,
                 slug,
-                content
+                content,
+                status
             })
+
         });
 
         const data = await response.json();
 
         if (!response.ok) {
+
             throw new Error(
                 data.error || "Unable to create page."
             );
+
         }
+
+        const statusText =
+            data.page.status === "published"
+                ? "published to"
+                : "saved as a draft in";
 
         result.innerHTML = `
             <br>
@@ -259,11 +310,13 @@ form.addEventListener("submit", async function (event) {
             </h3>
 
             <p>
-                Your page has been published to the organization archive.
+                Your page has been ${statusText}
+                the organization archive.
             </p>
         `;
 
         result.hidden = false;
+
         form.reset();
 
         await loadOrganizations();
@@ -287,18 +340,23 @@ form.addEventListener("submit", async function (event) {
         result.hidden = false;
 
     } finally {
+
         button.disabled = false;
         button.textContent = "Create Page";
+
     }
+
 });
 
 function escapeHTML(value) {
+
     return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
 
 loadOrganizations();
