@@ -4,7 +4,12 @@ export async function onRequestGet(context) {
     try {
         const organization = await context.env.DB
             .prepare(`
-                SELECT id, name, slug, description, created_at
+                SELECT
+                    id,
+                    name,
+                    slug,
+                    description,
+                    created_at
                 FROM organizations
                 WHERE slug = ?
             `)
@@ -13,73 +18,17 @@ export async function onRequestGet(context) {
 
         if (!organization) {
             return new Response(
-                `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Organization Not Found | Redmont Archives</title>
-                    <link rel="stylesheet" href="/styles.css">
-                </head>
-
-                <body>
-
-                    <header>
-                        <div class="container nav">
-
-                            <a class="brand" href="/">
-                                <span class="mark">RA</span>
-                                <span>Redmont Archives</span>
-                            </a>
-
-                        </div>
-                    </header>
-
-                    <main>
-
-                        <section class="section">
-
-                            <div class="container">
-
-                                <div class="eyebrow">
-                                    ORGANIZATION
-                                </div>
-
-                                <h1>
-                                    Organization not found
-                                </h1>
-
-                                <p>
-                                    The organization you're looking for could not
-                                    be found in the Redmont Archives.
-                                </p>
-
-                                <br>
-
-                                <a href="/">
-                                    ← Return to archive
-                                </a>
-
-                            </div>
-
-                        </section>
-
-                    </main>
-
-                </body>
-                </html>
-                `,
+                "Organization not found.",
                 {
                     status: 404,
                     headers: {
-                        "Content-Type": "text/html; charset=UTF-8"
+                        "Content-Type": "text/plain; charset=UTF-8"
                     }
                 }
             );
         }
 
-        const pages = await context.env.DB
+        const pagesResult = await context.env.DB
             .prepare(`
                 SELECT
                     id,
@@ -96,6 +45,8 @@ export async function onRequestGet(context) {
             .bind(organization.id)
             .all();
 
+        const pages = pagesResult.results || [];
+
         const organizationName =
             escapeHTML(organization.name);
 
@@ -105,29 +56,41 @@ export async function onRequestGet(context) {
                 "No organization description has been published."
             );
 
-        const organizationSlug =
+        const organizationSlugJSON =
             JSON.stringify(organization.slug);
 
         const organizationNameJSON =
             JSON.stringify(organization.name);
 
-        const pageHTML = pages.results.map(page => `
-            <article class="card">
+        let pageHTML = "";
 
-                <b>
-                    ORGANIZATION PAGE
-                </b>
+        for (const page of pages) {
+            pageHTML += `
+                <article class="card">
 
-                <h3>
-                    ${escapeHTML(page.title)}
-                </h3>
+                    <b>
+                        ORGANIZATION PAGE
+                    </b>
 
-                <p>
-                    ${escapeHTML(page.content)}
-                </p>
+                    <h3>
+                        ${escapeHTML(page.title)}
+                    </h3>
 
-            </article>
-        `).join("");
+                    <p>
+                        ${escapeHTML(page.content)}
+                    </p>
+
+                </article>
+            `;
+        }
+
+        const recordsHTML =
+            pageHTML ||
+            `
+                <div class="none">
+                    No published information is available yet.
+                </div>
+            `;
 
         const html = `
 <!DOCTYPE html>
@@ -136,9 +99,15 @@ export async function onRequestGet(context) {
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>${organizationName} | Redmont Archives</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ${organizationName} | Redmont Archives
+    </title>
 
     <meta
         name="description"
@@ -231,8 +200,8 @@ export async function onRequestGet(context) {
                 </h2>
 
                 <p>
-                    Ask a question about information published in this
-                    organization's Redmont Archives records.
+                    Ask a question about this organization's
+                    published Redmont Archives records.
                 </p>
 
                 <form id="ai-form">
@@ -242,15 +211,14 @@ export async function onRequestGet(context) {
                         type="text"
                         maxlength="1000"
                         placeholder="Ask a question..."
-                        autocomplete="off"
                         required
                     >
 
                     <br><br>
 
                     <button
-                        type="submit"
                         id="ai-button"
+                        type="submit"
                     >
                         Ask AI
                     </button>
@@ -284,21 +252,17 @@ export async function onRequestGet(context) {
                 </div>
 
                 <span>
-                    ${pages.results.length}
-                    ${pages.results.length === 1 ? "page" : "pages"}
+                    ${pages.length}
+                    ${pages.length === 1 ? "page" : "pages"}
                 </span>
 
             </div>
 
-            ${
-                pageHTML
-                    ? `<div class="grid">${pageHTML}</div>`
-                    : `
-                        <div class="none">
-                            No published information is available yet.
-                        </div>
-                    `
-            }
+            <div class="grid">
+
+                ${recordsHTML}
+
+            </div>
 
         </div>
 
@@ -317,8 +281,9 @@ export async function onRequestGet(context) {
             </h2>
 
             <p>
-                Information published here represents the organization's
-                public archive within Redmont Archives.
+                Information published here represents the
+                organization's public archive within
+                Redmont Archives.
             </p>
 
         </div>
@@ -345,6 +310,9 @@ export async function onRequestGet(context) {
 
 <script>
 
+const organizationSlug = ${organizationSlugJSON};
+const organizationName = ${organizationNameJSON};
+
 const aiForm =
     document.getElementById("ai-form");
 
@@ -357,109 +325,89 @@ const aiButton =
 const aiResult =
     document.getElementById("ai-result");
 
-const organizationSlug =
-    ${organizationSlug};
+aiForm.addEventListener("submit", async function (event) {
 
-const organizationName =
-    ${organizationNameJSON};
+    event.preventDefault();
 
-aiForm.addEventListener(
-    "submit",
-    async function (event) {
+    const query =
+        aiQuestion.value.trim();
 
-        event.preventDefault();
+    if (!query) {
+        return;
+    }
 
-        const query =
-            aiQuestion.value.trim();
+    aiButton.disabled = true;
+    aiButton.textContent = "Thinking...";
 
-        if (!query) {
-            return;
-        }
+    aiResult.hidden = false;
 
-        aiButton.disabled = true;
-        aiButton.textContent = "Thinking...";
+    aiResult.innerHTML =
+        "<p>Searching " +
+        escapeHTML(organizationName) +
+        " records...</p>";
 
-        aiResult.hidden = false;
+    try {
 
-        aiResult.innerHTML = \`
-            <br>
-
-            <div class="eyebrow">
-                ORGANIZATION AI
-            </div>
-
-            <p>
-                Searching \${escapeHTML(organizationName)} records...
-            </p>
-        \`;
-
-        try {
-
-            const response =
-                await fetch("/api/organization-ai", {
-
+        const response =
+            await fetch(
+                "/api/organization-ai",
+                {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
 
                     body: JSON.stringify({
-                        organization: organizationSlug,
-                        query
+                        organization:
+                            organizationSlug,
+
+                        query: query
                     })
+                }
+            );
 
-                });
+        const data =
+            await response.json();
 
-            const data =
-                await response.json();
+        if (!response.ok) {
 
-            if (!response.ok) {
-
-                throw new Error(
-                    data.error ||
-                    "Unable to complete AI request."
-                );
-
-            }
-
-            aiResult.innerHTML = \`
-                <br>
-
-                <div class="eyebrow">
-                    AI ANSWER
-                </div>
-
-                <p>
-                    \${formatAnswer(data.answer)}
-                </p>
-            \`;
-
-        } catch (error) {
-
-            console.error(error);
-
-            aiResult.innerHTML = \`
-                <br>
-
-                <div class="eyebrow">
-                    AI ERROR
-                </div>
-
-                <p>
-                    \${escapeHTML(error.message)}
-                </p>
-            \`;
-
-        } finally {
-
-            aiButton.disabled = false;
-            aiButton.textContent = "Ask AI";
+            throw new Error(
+                data.error ||
+                "Unable to complete AI request."
+            );
 
         }
 
+        aiResult.innerHTML =
+            "<div class=\"eyebrow\">" +
+            "AI ANSWER" +
+            "</div>" +
+            "<p>" +
+            formatAnswer(data.answer) +
+            "</p>";
+
+    } catch (error) {
+
+        console.error(error);
+
+        aiResult.innerHTML =
+            "<div class=\"eyebrow\">" +
+            "AI ERROR" +
+            "</div>" +
+            "<p>" +
+            escapeHTML(error.message) +
+            "</p>";
+
+    } finally {
+
+        aiButton.disabled = false;
+        aiButton.textContent = "Ask AI";
+
     }
-);
+
+});
 
 function formatAnswer(value) {
 
@@ -486,11 +434,16 @@ function escapeHTML(value) {
 </html>
         `;
 
-        return new Response(html, {
-            headers: {
-                "Content-Type": "text/html; charset=UTF-8"
+        return new Response(
+            html,
+            {
+                status: 200,
+                headers: {
+                    "Content-Type":
+                        "text/html; charset=UTF-8"
+                }
             }
-        });
+        );
 
     } catch (error) {
 
@@ -507,11 +460,20 @@ function escapeHTML(value) {
             <head>
 
                 <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-                <title>Error | Redmont Archives</title>
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0"
+                >
 
-                <link rel="stylesheet" href="/styles.css">
+                <title>
+                    Redmont Archives Error
+                </title>
+
+                <link
+                    rel="stylesheet"
+                    href="/styles.css"
+                >
 
             </head>
 
@@ -545,10 +507,9 @@ function escapeHTML(value) {
                             </h1>
 
                             <p>
-                                Please try again later.
+                                The organization page could not
+                                be loaded.
                             </p>
-
-                            <br>
 
                             <a href="/">
                                 ← Return to archive
@@ -567,9 +528,21 @@ function escapeHTML(value) {
             {
                 status: 500,
                 headers: {
-                    "Content-Type": "text/html; charset=UTF-8"
+                    "Content-Type":
+                        "text/html; charset=UTF-8"
                 }
             }
         );
     }
+}
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
 }
