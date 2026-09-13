@@ -23,6 +23,7 @@ export async function onRequestGet(context) {
                     <link rel="stylesheet" href="/styles.css">
                 </head>
                 <body>
+
                     <header>
                         <div class="container nav">
                             <a class="brand" href="/">
@@ -35,17 +36,30 @@ export async function onRequestGet(context) {
                     <main>
                         <section class="section">
                             <div class="container">
-                                <div class="eyebrow">ORGANIZATION</div>
-                                <h1>Organization not found</h1>
+
+                                <div class="eyebrow">
+                                    ORGANIZATION
+                                </div>
+
+                                <h1>
+                                    Organization not found
+                                </h1>
+
                                 <p>
                                     The organization you're looking for could not
                                     be found in the Redmont Archives.
                                 </p>
+
                                 <br>
-                                <a href="/">← Return to archive</a>
+
+                                <a href="/">
+                                    ← Return to archive
+                                </a>
+
                             </div>
                         </section>
                     </main>
+
                 </body>
                 </html>
                 `,
@@ -78,8 +92,14 @@ export async function onRequestGet(context) {
         const pageHTML = pages.results.map(page => `
             <article class="card">
                 <b>ORGANIZATION PAGE</b>
-                <h3>${escapeHTML(page.title)}</h3>
-                <p>${escapeHTML(page.content)}</p>
+
+                <h3>
+                    ${escapeHTML(page.title)}
+                </h3>
+
+                <p>
+                    ${escapeHTML(page.content)}
+                </p>
             </article>
         `).join("");
 
@@ -88,6 +108,7 @@ export async function onRequestGet(context) {
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -102,11 +123,13 @@ export async function onRequestGet(context) {
     >
 
     <link rel="stylesheet" href="/styles.css">
+
 </head>
 
 <body>
 
 <header>
+
     <div class="container nav">
 
         <a class="brand" href="/">
@@ -115,17 +138,27 @@ export async function onRequestGet(context) {
         </a>
 
         <nav>
+
             <a href="/">Archive</a>
-            <a href="/#categories">Categories</a>
-            <a href="/#about">About</a>
+
+            <a href="/#categories">
+                Categories
+            </a>
+
+            <a href="/#about">
+                About
+            </a>
+
         </nav>
 
     </div>
+
 </header>
 
 <main>
 
     <section class="hero">
+
         <div class="container hero-inner">
 
             <div class="eyebrow">
@@ -143,7 +176,16 @@ export async function onRequestGet(context) {
                 )}
             </p>
 
+            <div class="quick">
+
+                <a href="/create-page.html">
+                    Create Page
+                </a>
+
+            </div>
+
         </div>
+
     </section>
 
     <section class="section">
@@ -153,6 +195,7 @@ export async function onRequestGet(context) {
             <div class="heading">
 
                 <div>
+
                     <div class="eyebrow">
                         PUBLISHED INFORMATION
                     </div>
@@ -160,6 +203,7 @@ export async function onRequestGet(context) {
                     <h2>
                         Organization records
                     </h2>
+
                 </div>
 
                 <span>
@@ -240,26 +284,37 @@ export async function onRequestGet(context) {
             `
             <!DOCTYPE html>
             <html lang="en">
+
             <head>
+
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
                 <title>Error | Redmont Archives</title>
+
                 <link rel="stylesheet" href="/styles.css">
+
             </head>
 
             <body>
 
                 <header>
+
                     <div class="container nav">
+
                         <a class="brand" href="/">
                             <span class="mark">RA</span>
                             <span>Redmont Archives</span>
                         </a>
+
                     </div>
+
                 </header>
 
                 <main>
+
                     <section class="section">
+
                         <div class="container">
 
                             <div class="eyebrow">
@@ -281,10 +336,13 @@ export async function onRequestGet(context) {
                             </a>
 
                         </div>
+
                     </section>
+
                 </main>
 
             </body>
+
             </html>
             `,
             {
@@ -298,10 +356,12 @@ export async function onRequestGet(context) {
 }
 
 function escapeHTML(value) {
+
     return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
