@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Organizations | Redmont Archives</title>
+
+    <meta
+        name="description"
+        content="Browse organizations documented in the Redmont Archives."
+    >
+
+    <link rel="stylesheet" href="/styles.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
+
+        <nav>
+
+            <a href="/">
+                Archive
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="/#categories">
+                Categories
+            </a>
+
+            <a href="/#about">
+                About
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main>
+
+    <section class="hero">
+
+        <div class="container hero-inner">
+
+            <div class="eyebrow">
+                ORGANIZATION DIRECTORY
+            </div>
+
+            <h1>
+                Organizations
+            </h1>
+
+            <p>
+                Search organizations documented in the Redmont Archives.
+            </p>
+
+            <div class="search">
+
+                <input
+                    id="organization-search"
+                    type="search"
+                    placeholder="Search organizations..."
+                    aria-label="Search organizations"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="heading">
+
+                <div>
+
+                    <div class="eyebrow">
+                        DIRECTORY
+                    </div>
+
+                    <h2>
+                        All organizations
+                    </h2>
+
+                </div>
+
+                <span id="organization-count">
+                    Loading...
+                </span>
+
+            </div>
+
+            <div id="organization-grid" class="grid"></div>
+
+            <div id="organization-none" class="none" hidden>
+                No organizations matched your search.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Organization Directory
+        </span>
+
+    </div>
+
+</footer>
+
+<script>
+
+const searchInput =
+    document.getElementById("organization-search");
+
+const grid =
+    document.getElementById("organization-grid");
+
+const none =
+    document.getElementById("organization-none");
+
+const count =
+    document.getElementById("organization-count");
+
+let organizations = [];
+
+async function loadOrganizations() {
+
+    try {
+
+        const response =
+            await fetch("/api/organizations");
+
+        if (!response.ok) {
+            throw new Error("Unable to load organizations.");
+        }
+
+        const data =
+            await response.json();
+
+        organizations =
+            data.organizations || [];
+
+        renderOrganizations();
+
+    } catch (error) {
+
+        console.error(error);
+
+        count.textContent = "Error";
+
+        grid.innerHTML = `
+            <div class="none">
+                Unable to load organizations right now.
+            </div>
+        `;
+
+    }
+
+}
+
+function renderOrganizations() {
+
+    const query =
+        searchInput.value.trim().toLowerCase();
+
+    const filtered =
+        organizations.filter(organization => {
+
+            const name =
+                organization.name?.toLowerCase() || "";
+
+            const description =
+                organization.description?.toLowerCase() || "";
+
+            return (
+                name.includes(query) ||
+                description.includes(query)
+            );
+
+        });
+
+    count.textContent =
+        `${filtered.length} ${
+            filtered.length === 1
+                ? "organization"
+                : "organizations"
+        }`;
+
+    if (filtered.length === 0) {
+
+        grid.innerHTML = "";
+
+        none.hidden = false;
+
+        return;
+
+    }
+
+    none.hidden = true;
+
+    grid.innerHTML =
+        filtered.map(organization => `
+
+            <article class="card">
+
+                <b>
+                    ORGANIZATION
+                </b>
+
+                <h3>
+                    ${escapeHTML(organization.name)}
+                </h3>
+
+                <p>
+                    ${escapeHTML(
+                        organization.description ||
+                        "No description available."
+                    )}
+                </p>
+
+                <a href="/organizations/${encodeURIComponent(
+                    organization.slug
+                )}">
+                    View organization →
+                </a>
+
+            </article>
+
+        `).join("");
+
+}
+
+searchInput.addEventListener(
+    "input",
+    renderOrganizations
+);
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+loadOrganizations();
+
+</script>
+
+</body>
+
+</html>
