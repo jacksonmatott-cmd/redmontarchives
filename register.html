@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | Redmont Archives</title>
+
+    <meta
+        name="description"
+        content="Create a Redmont Archives account."
+    >
+
+    <link rel="stylesheet" href="/styles.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
+
+        <nav>
+
+            <a href="/">
+                Archive
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="/login.html">
+                Log In
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main>
+
+    <section class="hero">
+
+        <div class="container hero-inner">
+
+            <div class="eyebrow">
+                REDMONT ARCHIVES ACCOUNT
+            </div>
+
+            <h1>
+                Create an Account
+            </h1>
+
+            <p>
+                Create a Redmont Archives account using a username and password.
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="card">
+
+                <div class="eyebrow">
+                    ACCOUNT REGISTRATION
+                </div>
+
+                <h2>
+                    New Account
+                </h2>
+
+                <form id="register-form">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        minlength="3"
+                        maxlength="30"
+                        autocomplete="username"
+                        placeholder="Choose a username"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Choose a password"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="confirm-password">
+                        Confirm Password
+                    </label>
+
+                    <input
+                        id="confirm-password"
+                        name="confirm-password"
+                        type="password"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Enter your password again"
+                        required
+                    >
+
+                    <br><br>
+
+                    <button
+                        type="submit"
+                        id="register-button"
+                    >
+                        Create Account
+                    </button>
+
+                </form>
+
+                <div id="result" hidden></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Account Registration
+        </span>
+
+    </div>
+
+</footer>
+
+<script>
+
+const form =
+    document.getElementById("register-form");
+
+const result =
+    document.getElementById("result");
+
+const button =
+    document.getElementById("register-button");
+
+form.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const confirmPassword =
+        document.getElementById("confirm-password").value;
+
+    result.hidden = true;
+    result.innerHTML = "";
+
+    if (password !== confirmPassword) {
+
+        result.innerHTML = `
+            <br>
+
+            <div class="eyebrow">
+                ERROR
+            </div>
+
+            <p>
+                Passwords do not match.
+            </p>
+        `;
+
+        result.hidden = false;
+
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Creating...";
+
+    try {
+
+        const response =
+            await fetch("/api/register", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Unable to create account."
+            );
+
+        }
+
+        result.innerHTML = `
+            <br>
+
+            <div class="eyebrow">
+                ACCOUNT CREATED
+            </div>
+
+            <h3>
+                Welcome, ${escapeHTML(data.user.username)}
+            </h3>
+
+            <p>
+                Your Redmont Archives account has been created.
+            </p>
+
+            <p>
+                <a href="/login.html">
+                    Continue to login →
+                </a>
+            </p>
+        `;
+
+        result.hidden = false;
+
+        form.reset();
+
+    } catch (error) {
+
+        console.error(error);
+
+        result.innerHTML = `
+            <br>
+
+            <div class="eyebrow">
+                ERROR
+            </div>
+
+            <p>
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
+        result.hidden = false;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Create Account";
+
+    }
+
+});
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+</body>
+
+</html>
