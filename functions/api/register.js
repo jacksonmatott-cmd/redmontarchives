@@ -12,7 +12,8 @@ export async function onRequestPost(context) {
         if (!username || typeof password !== "string") {
             return Response.json(
                 {
-                    error: "Username and password are required."
+                    error: "Username and password are required.",
+                    step: "validation"
                 },
                 { status: 400 }
             );
@@ -21,7 +22,8 @@ export async function onRequestPost(context) {
         if (username.length < 3 || username.length > 30) {
             return Response.json(
                 {
-                    error: "Username must be between 3 and 30 characters."
+                    error: "Username must be between 3 and 30 characters.",
+                    step: "validation"
                 },
                 { status: 400 }
             );
@@ -30,7 +32,8 @@ export async function onRequestPost(context) {
         if (!/^[A-Za-z0-9_-]+$/.test(username)) {
             return Response.json(
                 {
-                    error: "Username may only contain letters, numbers, underscores, and hyphens."
+                    error: "Username may only contain letters, numbers, underscores, and hyphens.",
+                    step: "validation"
                 },
                 { status: 400 }
             );
@@ -39,7 +42,8 @@ export async function onRequestPost(context) {
         if (password.length < 8) {
             return Response.json(
                 {
-                    error: "Password must be at least 8 characters long."
+                    error: "Password must be at least 8 characters long.",
+                    step: "validation"
                 },
                 { status: 400 }
             );
@@ -57,13 +61,15 @@ export async function onRequestPost(context) {
         if (existingUser) {
             return Response.json(
                 {
-                    error: "That username is already in use."
+                    error: "That username is already in use.",
+                    step: "database-check"
                 },
                 { status: 409 }
             );
         }
 
         const salt = new Uint8Array(SALT_LENGTH);
+
         crypto.getRandomValues(salt);
 
         const passwordKey = await crypto.subtle.importKey(
@@ -86,6 +92,7 @@ export async function onRequestPost(context) {
         );
 
         const saltBase64 = bytesToBase64(salt);
+
         const hashBase64 = bytesToBase64(
             new Uint8Array(derivedBits)
         );
@@ -118,11 +125,14 @@ export async function onRequestPost(context) {
         });
 
     } catch (error) {
+
         console.error("Registration error:", error);
 
         return Response.json(
             {
-                error: "Unable to create account."
+                error: error.message || "Unable to create account.",
+                error_name: error.name || "UnknownError",
+                step: "server"
             },
             { status: 500 }
         );
@@ -130,6 +140,7 @@ export async function onRequestPost(context) {
 }
 
 function bytesToBase64(bytes) {
+
     let binary = "";
 
     for (const byte of bytes) {
@@ -137,4 +148,5 @@ function bytesToBase64(bytes) {
     }
 
     return btoa(binary);
+
 }
