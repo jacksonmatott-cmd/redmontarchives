@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Log In | Redmont Archives</title>
+
+    <meta
+        name="description"
+        content="Log in to your Redmont Archives account."
+    >
+
+    <link rel="stylesheet" href="/styles.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container nav">
+
+        <a class="brand" href="/">
+            <span class="mark">RA</span>
+            <span>Redmont Archives</span>
+        </a>
+
+        <nav>
+
+            <a href="/">
+                Archive
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="/register.html">
+                Create Account
+            </a>
+
+        </nav>
+
+    </div>
+
+</header>
+
+<main>
+
+    <section class="hero">
+
+        <div class="container hero-inner">
+
+            <div class="eyebrow">
+                REDMONT ARCHIVES ACCOUNT
+            </div>
+
+            <h1>
+                Log In
+            </h1>
+
+            <p>
+                Sign in to your Redmont Archives account.
+            </p>
+
+        </div>
+
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="card">
+
+                <div class="eyebrow">
+                    ACCOUNT LOGIN
+                </div>
+
+                <h2>
+                    Sign In
+                </h2>
+
+                <form id="login-form">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        id="username"
+                        name="username"
+                        type="text"
+                        autocomplete="username"
+                        placeholder="Enter your username"
+                        required
+                    >
+
+                    <br><br>
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                    <br><br>
+
+                    <button
+                        type="submit"
+                        id="login-button"
+                    >
+                        Log In
+                    </button>
+
+                </form>
+
+                <div id="result" hidden></div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+
+    <div class="container foot">
+
+        <span>
+            © 2026 Redmont Archives
+        </span>
+
+        <span>
+            Account Login
+        </span>
+
+    </div>
+
+</footer>
+
+<script>
+
+const form =
+    document.getElementById("login-form");
+
+const result =
+    document.getElementById("result");
+
+const button =
+    document.getElementById("login-button");
+
+form.addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    result.hidden = true;
+    result.innerHTML = "";
+
+    button.disabled = true;
+    button.textContent = "Logging in...";
+
+    try {
+
+        const response =
+            await fetch("/api/login", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Unable to log in."
+            );
+
+        }
+
+        result.innerHTML = `
+            <br>
+
+            <div class="eyebrow">
+                LOGIN SUCCESSFUL
+            </div>
+
+            <h3>
+                Welcome back, ${escapeHTML(data.user.username)}
+            </h3>
+
+            <p>
+                You are now logged in to Redmont Archives.
+            </p>
+        `;
+
+        result.hidden = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        result.innerHTML = `
+            <br>
+
+            <div class="eyebrow">
+                LOGIN FAILED
+            </div>
+
+            <p>
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
+        result.hidden = false;
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "Log In";
+
+    }
+
+});
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
+
+</body>
+
+</html>
