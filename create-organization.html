@@ -2,17 +2,34 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Create Organization | Redmont Archives</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="/styles.css">
+    <title>
+        Create Organization | Redmont Archives
+    </title>
+
+    <meta
+        name="description"
+        content="Create an organization on Redmont Archives."
+    >
+
+    <link
+        rel="stylesheet"
+        href="/styles.css"
+    >
+
 </head>
 
 <body>
 
 <header>
+
     <div class="container nav">
 
         <a class="brand" href="/">
@@ -21,17 +38,29 @@
         </a>
 
         <nav>
-            <a href="/">Archive</a>
-            <a href="/#categories">Categories</a>
-            <a href="/#about">About</a>
+
+            <a href="/">
+                Archive
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="/login.html">
+                Log In
+            </a>
+
         </nav>
 
     </div>
+
 </header>
 
 <main>
 
     <section class="hero">
+
         <div class="container hero-inner">
 
             <div class="eyebrow">
@@ -43,10 +72,11 @@
             </h1>
 
             <p>
-                Create a public organization archive on Redmont Archives.
+                You must be logged in to create and manage an organization.
             </p>
 
         </div>
+
     </section>
 
     <section class="section">
@@ -56,11 +86,11 @@
             <div class="card">
 
                 <div class="eyebrow">
-                    ORGANIZATION INFORMATION
+                    NEW ORGANIZATION
                 </div>
 
                 <h2>
-                    New Organization
+                    Organization Information
                 </h2>
 
                 <form id="organization-form">
@@ -73,25 +103,28 @@
                         id="name"
                         name="name"
                         type="text"
-                        placeholder="Example Organization"
+                        maxlength="100"
+                        placeholder="Organization name"
                         required
                     >
 
-                    <br><br>
+                    <br>
+                    <br>
 
                     <label for="slug">
-                        Organization Slug
+                        URL Slug
                     </label>
 
                     <input
                         id="slug"
                         name="slug"
                         type="text"
-                        placeholder="example-organization"
-                        required
+                        maxlength="100"
+                        placeholder="organization-name"
                     >
 
-                    <br><br>
+                    <br>
+                    <br>
 
                     <label for="description">
                         Description
@@ -100,19 +133,27 @@
                     <textarea
                         id="description"
                         name="description"
-                        placeholder="Describe this organization..."
+                        maxlength="1000"
                         rows="6"
+                        placeholder="Describe this organization..."
                     ></textarea>
 
-                    <br><br>
+                    <br>
+                    <br>
 
-                    <button type="submit" id="create-button">
+                    <button
+                        id="create-button"
+                        type="submit"
+                    >
                         Create Organization
                     </button>
 
                 </form>
 
-                <div id="result" hidden></div>
+                <div
+                    id="result"
+                    hidden
+                ></div>
 
             </div>
 
@@ -131,7 +172,7 @@
         </span>
 
         <span>
-            Organization Directory
+            Organization Creation
         </span>
 
     </div>
@@ -139,94 +180,161 @@
 </footer>
 
 <script>
-const form = document.getElementById("organization-form");
-const result = document.getElementById("result");
-const button = document.getElementById("create-button");
 
-form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+const form =
+    document.getElementById("organization-form");
 
-    const name = document.getElementById("name").value.trim();
-    const slug = document.getElementById("slug").value.trim();
-    const description = document.getElementById("description").value.trim();
+const button =
+    document.getElementById("create-button");
 
-    button.disabled = true;
-    button.textContent = "Creating...";
+const result =
+    document.getElementById("result");
 
-    result.hidden = true;
-    result.innerHTML = "";
+form.addEventListener(
+    "submit",
+    async function(event) {
 
-    try {
-        const response = await fetch("/api/create-organization", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name,
-                slug,
-                description
-            })
-        });
+        event.preventDefault();
 
-        const data = await response.json();
+        const name =
+            document.getElementById("name")
+                .value
+                .trim();
 
-        if (!response.ok) {
-            throw new Error(
-                data.error || "Unable to create organization."
-            );
+        const slug =
+            document.getElementById("slug")
+                .value
+                .trim();
+
+        const description =
+            document.getElementById("description")
+                .value
+                .trim();
+
+        button.disabled = true;
+        button.textContent = "Creating...";
+
+        result.hidden = true;
+        result.textContent = "";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/create-organization",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            name,
+                            slug,
+                            description
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                response.status === 401 &&
+                data.redirect
+            ) {
+
+                const returnTo =
+                    window.location.pathname +
+                    window.location.search;
+
+                window.location.href =
+                    data.redirect +
+                    "?returnTo=" +
+                    encodeURIComponent(
+                        returnTo
+                    );
+
+                return;
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to create organization."
+                );
+
+            }
+
+            result.innerHTML =
+                "<div class=\"eyebrow\">" +
+                "ORGANIZATION CREATED" +
+                "</div>" +
+                "<h3>" +
+                escapeHTML(
+                    data.organization.name
+                ) +
+                "</h3>" +
+                "<p>" +
+                "Your organization has been created." +
+                "</p>" +
+                "<p>" +
+                "<a href=\"/organizations/" +
+                encodeURIComponent(
+                    data.organization.slug
+                ) +
+                "\">" +
+                "View organization →" +
+                "</a>" +
+                "</p>";
+
+            result.hidden = false;
+
+            form.reset();
+
+        } catch (error) {
+
+            console.error(error);
+
+            result.innerHTML =
+                "<div class=\"eyebrow\">" +
+                "ERROR" +
+                "</div>" +
+                "<p>" +
+                escapeHTML(
+                    error.message
+                ) +
+                "</p>";
+
+            result.hidden = false;
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent =
+                "Create Organization";
+
         }
 
-        result.innerHTML = `
-            <br>
-            <div class="eyebrow">ORGANIZATION CREATED</div>
-
-            <h3>${escapeHTML(data.organization.name)}</h3>
-
-            <p>
-                Your organization has been added to the Redmont Archives.
-            </p>
-
-            <p>
-                <a href="/organizations/${encodeURIComponent(data.organization.slug)}">
-                    View organization archive →
-                </a>
-            </p>
-        `;
-
-        result.hidden = false;
-        form.reset();
-
-    } catch (error) {
-
-        console.error(error);
-
-        result.innerHTML = `
-            <br>
-            <div class="eyebrow">ERROR</div>
-
-            <p>
-                ${escapeHTML(error.message)}
-            </p>
-        `;
-
-        result.hidden = false;
-
-    } finally {
-        button.disabled = false;
-        button.textContent = "Create Organization";
     }
-});
+);
 
 function escapeHTML(value) {
+
     return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
+
 </script>
 
 </body>
+
 </html>
