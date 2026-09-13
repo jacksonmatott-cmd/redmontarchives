@@ -22,19 +22,24 @@ export async function onRequestGet(context) {
                     <title>Organization Not Found | Redmont Archives</title>
                     <link rel="stylesheet" href="/styles.css">
                 </head>
+
                 <body>
 
                     <header>
                         <div class="container nav">
+
                             <a class="brand" href="/">
                                 <span class="mark">RA</span>
                                 <span>Redmont Archives</span>
                             </a>
+
                         </div>
                     </header>
 
                     <main>
+
                         <section class="section">
+
                             <div class="container">
 
                                 <div class="eyebrow">
@@ -57,7 +62,9 @@ export async function onRequestGet(context) {
                                 </a>
 
                             </div>
+
                         </section>
+
                     </main>
 
                 </body>
@@ -91,7 +98,10 @@ export async function onRequestGet(context) {
 
         const pageHTML = pages.results.map(page => `
             <article class="card">
-                <b>ORGANIZATION PAGE</b>
+
+                <b>
+                    ORGANIZATION PAGE
+                </b>
 
                 <h3>
                     ${escapeHTML(page.title)}
@@ -100,6 +110,7 @@ export async function onRequestGet(context) {
                 <p>
                     ${escapeHTML(page.content)}
                 </p>
+
             </article>
         `).join("");
 
@@ -139,7 +150,9 @@ export async function onRequestGet(context) {
 
         <nav>
 
-            <a href="/">Archive</a>
+            <a href="/">
+                Archive
+            </a>
 
             <a href="/#categories">
                 Categories
@@ -178,7 +191,7 @@ export async function onRequestGet(context) {
 
             <div class="quick">
 
-                <a href="/create-page.html">
+                <a href="/create-page.html?organization=${encodeURIComponent(organization.slug)}">
                     Create Page
                 </a>
 
