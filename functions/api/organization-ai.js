@@ -3,8 +3,11 @@ const MAX_RECORDS = 50;
 const MAX_CONTEXT_CHARACTERS = 50000;
 
 export async function onRequestPost(context) {
+
     try {
-        const body = await context.request.json();
+
+        const body =
+            await context.request.json();
 
         const query =
             typeof body.query === "string"
@@ -17,35 +20,44 @@ export async function onRequestPost(context) {
                 : "";
 
         if (!query) {
+
             return Response.json(
                 {
-                    error: "A question is required."
+                    error:
+                        "A question is required."
                 },
                 { status: 400 }
             );
+
         }
 
         if (query.length > MAX_QUERY_LENGTH) {
+
             return Response.json(
                 {
-                    error: "Question is too long."
+                    error:
+                        "Question is too long."
                 },
                 { status: 400 }
             );
+
         }
 
         if (!organizationSlug) {
+
             return Response.json(
                 {
-                    error: "Organization is required."
+                    error:
+                        "Organization is required."
                 },
                 { status: 400 }
             );
+
         }
 
         /*
          * ---------------------------------------------------------
-         * ACCESS CHECK
+         * REQUIRE LOGIN
          * ---------------------------------------------------------
          */
 
@@ -53,16 +65,32 @@ export async function onRequestPost(context) {
             context.request.headers.get("Cookie") || "";
 
         const sessionToken =
-            getCookie(cookieHeader, "redmont_session");
+            getCookie(
+                cookieHeader,
+                "redmont_session"
+            );
 
-        let authenticatedUser = null;
+        if (!sessionToken) {
 
-        if (sessionToken) {
+            return Response.json(
+                {
+                    error:
+                        "Login required.",
+                    redirect:
+                        "/login.html"
+                },
+                { status: 401 }
+            );
 
-            const sessionTokenHash =
-                await sha256Base64Url(sessionToken);
+        }
 
-            const session = await context.env.DB
+        const sessionTokenHash =
+            await sha256Base64Url(
+                sessionToken
+            );
+
+        const session =
+            await context.env.DB
                 .prepare(`
                     SELECT
                         sessions.id,
@@ -77,30 +105,47 @@ export async function onRequestPost(context) {
                 .bind(sessionTokenHash)
                 .first();
 
-            if (session) {
+        if (!session) {
 
-                const expiresAt =
-                    new Date(session.expires_at);
+            return Response.json(
+                {
+                    error:
+                        "Login required.",
+                    redirect:
+                        "/login.html"
+                },
+                { status: 401 }
+            );
 
-                if (expiresAt > new Date()) {
+        }
 
-                    authenticatedUser = {
-                        id: session.user_id,
-                        username: session.username
-                    };
+        const expiresAt =
+            new Date(
+                session.expires_at
+            );
 
-                } else {
+        if (
+            expiresAt <= new Date()
+        ) {
 
-                    await context.env.DB
-                        .prepare(`
-                            DELETE FROM sessions
-                            WHERE id = ?
-                        `)
-                        .bind(session.id)
-                        .run();
+            await context.env.DB
+                .prepare(`
+                    DELETE FROM sessions
+                    WHERE id = ?
+                `)
+                .bind(session.id)
+                .run();
 
-                }
-            }
+            return Response.json(
+                {
+                    error:
+                        "Your session has expired.",
+                    redirect:
+                        "/login.html"
+                },
+                { status: 401 }
+            );
+
         }
 
         /*
@@ -109,32 +154,31 @@ export async function onRequestPost(context) {
          * ---------------------------------------------------------
          */
 
-        const organization = await context.env.DB
-            .prepare(`
-                SELECT
-                    id,
-                    name,
-                    slug,
-                    description
-                FROM organizations
-                WHERE slug = ?
-            `)
-            .bind(organizationSlug)
-            .first();
+        const organization =
+            await context.env.DB
+                .prepare(`
+                    SELECT
+                        id,
+                        name,
+                        slug,
+                        description
+                    FROM organizations
+                    WHERE slug = ?
+                `)
+                .bind(organizationSlug)
+                .first();
 
         if (!organization) {
+
             return Response.json(
                 {
-                    error: "Organization not found."
+                    error:
+                        "Organization not found."
                 },
                 { status: 404 }
             );
-        }
 
-        /*
-         * A valid organization provides anonymous AI context.
-         * Logged-in users are also allowed.
-         */
+        }
 
         /*
          * ---------------------------------------------------------
@@ -142,33 +186,32 @@ export async function onRequestPost(context) {
          * ---------------------------------------------------------
          */
 
-        const records = await context.env.DB
-            .prepare(`
-                SELECT
-                    id,
-                    title,
-                    slug,
-                    content
-                FROM pages
-                WHERE organization_id = ?
-                  AND status = 'published'
-                ORDER BY title ASC
-                LIMIT ?
-            `)
-            .bind(
-                organization.id,
-                MAX_RECORDS
-            )
-            .all();
-
-        /*
-         * Only published records belonging to this organization
-         * are included in the AI context.
-         */
+        const records =
+            await context.env.DB
+                .prepare(`
+                    SELECT
+                        id,
+                        title,
+                        slug,
+                        content
+                    FROM pages
+                    WHERE organization_id = ?
+                      AND status = 'published'
+                    ORDER BY title ASC
+                    LIMIT ?
+                `)
+                .bind(
+                    organization.id,
+                    MAX_RECORDS
+                )
+                .all();
 
         let contextText = "";
 
-        for (const record of records.results) {
+        for (
+            const record
+            of records.results
+        ) {
 
             const recordText = [
                 `TITLE: ${record.title}`,
@@ -185,12 +228,15 @@ export async function onRequestPost(context) {
                 break;
             }
 
-            contextText += recordText + "\n\n";
+            contextText +=
+                recordText +
+                "\n\n";
+
         }
 
         /*
          * ---------------------------------------------------------
-         * GROQ REQUEST
+         * GROQ
          * ---------------------------------------------------------
          */
 
@@ -206,6 +252,7 @@ export async function onRequestPost(context) {
                 },
                 { status: 503 }
             );
+
         }
 
         const model =
@@ -251,12 +298,15 @@ ${contextText || "No published records are currently available."}
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json",
+                        "Content-Type":
+                            "application/json",
+
                         "Authorization":
                             `Bearer ${apiKey}`
                     },
 
                     body: JSON.stringify({
+
                         model,
 
                         messages: [
@@ -273,6 +323,7 @@ ${contextText || "No published records are currently available."}
                         temperature: 0.2,
 
                         max_completion_tokens: 1000
+
                     })
                 }
             );
@@ -294,11 +345,14 @@ ${contextText || "No published records are currently available."}
                 },
                 { status: 502 }
             );
+
         }
 
         const answer =
-            groqData?.choices?.[0]?.message?.content
-            ?.trim();
+            groqData
+                ?.choices?.[0]
+                ?.message?.content
+                ?.trim();
 
         if (!answer) {
 
@@ -309,9 +363,11 @@ ${contextText || "No published records are currently available."}
                 },
                 { status: 502 }
             );
+
         }
 
         return Response.json({
+
             success: true,
 
             organization: {
@@ -324,16 +380,13 @@ ${contextText || "No published records are currently available."}
 
             answer,
 
-            authenticated:
-                Boolean(authenticatedUser),
+            authenticated: true,
 
-            user:
-                authenticatedUser
-                    ? {
-                        id: authenticatedUser.id,
-                        username: authenticatedUser.username
-                    }
-                    : null
+            user: {
+                id: session.user_id,
+                username: session.username
+            }
+
         });
 
     } catch (error) {
@@ -350,15 +403,23 @@ ${contextText || "No published records are currently available."}
             },
             { status: 500 }
         );
+
     }
+
 }
 
-function getCookie(cookieHeader, name) {
+function getCookie(
+    cookieHeader,
+    name
+) {
 
     const cookies =
         cookieHeader.split(";");
 
-    for (const cookie of cookies) {
+    for (
+        const cookie
+        of cookies
+    ) {
 
         const trimmed =
             cookie.trim();
@@ -368,18 +429,24 @@ function getCookie(cookieHeader, name) {
                 name + "="
             )
         ) {
+
             return decodeURIComponent(
                 trimmed.substring(
                     name.length + 1
                 )
             );
+
         }
+
     }
 
     return null;
+
 }
 
-async function sha256Base64Url(value) {
+async function sha256Base64Url(
+    value
+) {
 
     const digest =
         await crypto.subtle.digest(
@@ -390,18 +457,30 @@ async function sha256Base64Url(value) {
     return bytesToBase64Url(
         new Uint8Array(digest)
     );
+
 }
 
-function bytesToBase64Url(bytes) {
+function bytesToBase64Url(
+    bytes
+) {
 
     let binary = "";
 
-    for (const byte of bytes) {
-        binary += String.fromCharCode(byte);
+    for (
+        const byte
+        of bytes
+    ) {
+
+        binary +=
+            String.fromCharCode(
+                byte
+            );
+
     }
 
     return btoa(binary)
         .replace(/\+/g, "-")
         .replace(/\//g, "_")
         .replace(/=+$/g, "");
+
 }
