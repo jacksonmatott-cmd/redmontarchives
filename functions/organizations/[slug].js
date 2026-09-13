@@ -1,3 +1,4 @@
+```javascript
 export async function onRequestGet(context) {
     const slug = context.params.slug;
 
@@ -61,10 +62,7 @@ export async function onRequestGet(context) {
         for (const page of pages) {
             pageHTML += `
                 <article class="card">
-
-                    <b>
-                        ORGANIZATION PAGE
-                    </b>
+                    <b>ORGANIZATION PAGE</b>
 
                     <h3>
                         ${escapeHTML(page.title)}
@@ -73,7 +71,6 @@ export async function onRequestGet(context) {
                     <p>
                         ${escapeHTML(page.content)}
                     </p>
-
                 </article>
             `;
         }
@@ -127,10 +124,7 @@ export async function onRequestGet(context) {
         </a>
 
         <nav>
-
-            <a href="/">
-                Archive
-            </a>
+            <a href="/">Archive</a>
 
             <a href="/organizations.html">
                 Organizations
@@ -143,7 +137,6 @@ export async function onRequestGet(context) {
             <a href="/#about">
                 About
             </a>
-
         </nav>
 
     </div>
@@ -224,19 +217,14 @@ export async function onRequestGet(context) {
 
                 </form>
 
-                <div
-                    id="ai-result"
-                    hidden
-                >
+                <div id="ai-result" hidden>
 
                     <div
                         id="ai-label"
                         class="eyebrow"
                     ></div>
 
-                    <p
-                        id="ai-answer"
-                    ></p>
+                    <p id="ai-answer"></p>
 
                 </div>
 
@@ -272,32 +260,8 @@ export async function onRequestGet(context) {
             </div>
 
             <div class="grid">
-
                 ${pageHTML}
-
             </div>
-
-        </div>
-
-    </section>
-
-    <section class="section alt">
-
-        <div class="container">
-
-            <div class="eyebrow">
-                REDMONT ARCHIVES
-            </div>
-
-            <h2>
-                Organization information
-            </h2>
-
-            <p>
-                Information published here represents the
-                organization's public archive within
-                Redmont Archives.
-            </p>
 
         </div>
 
@@ -393,6 +357,23 @@ aiForm.addEventListener(
 
             const data =
                 await response.json();
+
+            if (
+                response.status === 401
+            ) {
+
+                const returnTo =
+                    window.location.pathname +
+                    window.location.search;
+
+                window.location.href =
+                    "/login.html?returnTo=" +
+                    encodeURIComponent(
+                        returnTo
+                    );
+
+                return;
+            }
 
             if (!response.ok) {
 
@@ -568,3 +549,4 @@ function escapeHTML(value) {
         .replace(/'/g, "&#039;");
 
 }
+```
