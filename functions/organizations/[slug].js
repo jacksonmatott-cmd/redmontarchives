@@ -17,15 +17,12 @@ export async function onRequestGet(context) {
             .first();
 
         if (!organization) {
-            return new Response(
-                "Organization not found.",
-                {
-                    status: 404,
-                    headers: {
-                        "Content-Type": "text/plain; charset=UTF-8"
-                    }
+            return new Response("Organization not found.", {
+                status: 404,
+                headers: {
+                    "Content-Type": "text/plain; charset=UTF-8"
                 }
-            );
+            });
         }
 
         const pagesResult = await context.env.DB
@@ -84,13 +81,13 @@ export async function onRequestGet(context) {
             `;
         }
 
-        const recordsHTML =
-            pageHTML ||
-            `
+        if (!pageHTML) {
+            pageHTML = `
                 <div class="none">
                     No published information is available yet.
                 </div>
             `;
+        }
 
         const html = `
 <!DOCTYPE html>
@@ -211,6 +208,7 @@ export async function onRequestGet(context) {
                         type="text"
                         maxlength="1000"
                         placeholder="Ask a question..."
+                        autocomplete="off"
                         required
                     >
 
@@ -260,7 +258,7 @@ export async function onRequestGet(context) {
 
             <div class="grid">
 
-                ${recordsHTML}
+                ${pageHTML}
 
             </div>
 
@@ -325,7 +323,7 @@ const aiButton =
 const aiResult =
     document.getElementById("ai-result");
 
-aiForm.addEventListener("submit", async function (event) {
+aiForm.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
@@ -342,9 +340,15 @@ aiForm.addEventListener("submit", async function (event) {
     aiResult.hidden = false;
 
     aiResult.innerHTML =
-        "<p>Searching " +
+        "<br>" +
+        "<div class=\\"eyebrow\\">" +
+        "ORGANIZATION AI" +
+        "</div>" +
+        "<p>" +
+        "Searching " +
         escapeHTML(organizationName) +
-        " records...</p>";
+        " records..." +
+        "</p>";
 
     try {
 
@@ -363,7 +367,8 @@ aiForm.addEventListener("submit", async function (event) {
                         organization:
                             organizationSlug,
 
-                        query: query
+                        query:
+                            query
                     })
                 }
             );
@@ -381,7 +386,8 @@ aiForm.addEventListener("submit", async function (event) {
         }
 
         aiResult.innerHTML =
-            "<div class=\"eyebrow\">" +
+            "<br>" +
+            "<div class=\\"eyebrow\\">" +
             "AI ANSWER" +
             "</div>" +
             "<p>" +
@@ -393,7 +399,8 @@ aiForm.addEventListener("submit", async function (event) {
         console.error(error);
 
         aiResult.innerHTML =
-            "<div class=\"eyebrow\">" +
+            "<br>" +
+            "<div class=\\"eyebrow\\">" +
             "AI ERROR" +
             "</div>" +
             "<p>" +
@@ -430,20 +437,16 @@ function escapeHTML(value) {
 </script>
 
 </body>
-
 </html>
         `;
 
-        return new Response(
-            html,
-            {
-                status: 200,
-                headers: {
-                    "Content-Type":
-                        "text/html; charset=UTF-8"
-                }
+        return new Response(html, {
+            status: 200,
+            headers: {
+                "Content-Type":
+                    "text/html; charset=UTF-8"
             }
-        );
+        });
 
     } catch (error) {
 
@@ -510,6 +513,8 @@ function escapeHTML(value) {
                                 The organization page could not
                                 be loaded.
                             </p>
+
+                            <br>
 
                             <a href="/">
                                 ← Return to archive
