@@ -21,16 +21,41 @@
 
     <div class="container nav">
 
-        <a class="brand" href="#">
+        <a class="brand" href="/">
             <span class="mark">RA</span>
             <span>Redmont Archives</span>
         </a>
 
-        <nav>
-            <a href="#records">Records</a>
-            <a href="/organizations.html">Organizations</a>
-            <a href="#categories">Categories</a>
-            <a href="#about">About</a>
+        <nav id="main-nav">
+
+            <a href="#records">
+                Records
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="#categories">
+                Categories
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+            <span id="account-links">
+
+                <a href="/login.html">
+                    Log In
+                </a>
+
+                <a href="/register.html">
+                    Create Account
+                </a>
+
+            </span>
+
         </nav>
 
     </div>
@@ -349,6 +374,104 @@
 </footer>
 
 <script src="script.js"></script>
+
+<script>
+
+async function updateAccountNavigation() {
+
+    const accountLinks =
+        document.getElementById("account-links");
+
+    try {
+
+        const response =
+            await fetch("/api/me");
+
+        const data =
+            await response.json();
+
+        if (data.authenticated) {
+
+            accountLinks.innerHTML = `
+
+                <a href="/account.html">
+                    Account
+                </a>
+
+                <a href="#" id="logout-link">
+                    Log Out
+                </a>
+
+            `;
+
+            document
+                .getElementById("logout-link")
+                .addEventListener("click", logout);
+
+        } else {
+
+            accountLinks.innerHTML = `
+
+                <a href="/login.html">
+                    Log In
+                </a>
+
+                <a href="/register.html">
+                    Create Account
+                </a>
+
+            `;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Unable to load account status:",
+            error
+        );
+
+    }
+
+}
+
+async function logout(event) {
+
+    event.preventDefault();
+
+    try {
+
+        const response =
+            await fetch("/api/logout", {
+                method: "POST"
+            });
+
+        const data =
+            await response.json();
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.error || "Unable to log out."
+            );
+
+        }
+
+        window.location.reload();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Unable to log out.");
+
+    }
+
+}
+
+updateAccountNavigation();
+
+</script>
 
 </body>
 </html>
