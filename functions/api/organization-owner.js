@@ -5,14 +5,17 @@ export async function onRequestGet(context) {
 
         if (!slug) {
             return Response.json(
-                { authenticated: false, owner: false, error: "Organization is required." },
+                {
+                    authenticated: false,
+                    owner: false,
+                    error: "Organization is required."
+                },
                 { status: 400 }
             );
         }
 
-        const sessionCookie = context.request.headers.get("Cookie") || "";
-
-        const match = sessionCookie.match(/redmont_session=([^;]+)/);
+        const cookieHeader = context.request.headers.get("Cookie") || "";
+        const match = cookieHeader.match(/redmont_session=([^;]+)/);
 
         if (!match) {
             return Response.json({
@@ -23,15 +26,7 @@ export async function onRequestGet(context) {
 
         const sessionToken = match[1];
 
-        const encoder = new TextEncoder();
-        const data = encoder.encode(sessionToken);
-        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-        const sessionTokenHash = Array.from(
-            new Uint8Array(hashBuffer)
-        )
-            .map(byte => byte.toString(16).padStart(2, "0"))
-            .join("");
+        const sessionTokenHash = await sha256Base64Url(sessionToken);
 
         const session = await context.env.DB.prepare(`
             SELECT user_id, expires_at
@@ -80,7 +75,7 @@ export async function onRequestGet(context) {
         });
 
     } catch (error) {
-        console.error(error);
+        console.error("Organization owner error:", error);
 
         return Response.json(
             {
@@ -91,4 +86,28 @@ export async function onRequestGet(context) {
             { status: 500 }
         );
     }
+}
+
+async function sha256Base64Url(value) {
+    const data = new TextEncoder().encode(value);
+
+    const hashBuffer = await crypto.subtle.digest(
+        "SHA-256",
+        data
+    );
+
+    return bytesToBase64Url(new Uint8Array(hashBuffer));
+}
+
+function bytesToBase64Url(bytes) {
+    let binary = "";
+
+    for (const byte of bytes) {
+        binary += String.fromCharCode(byte);
+    }
+
+    return btoa(binary)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/g, "");
 }
