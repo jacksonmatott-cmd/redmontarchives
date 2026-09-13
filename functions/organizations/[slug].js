@@ -41,20 +41,29 @@ export async function onRequestGet(context) {
         for (const page of pages) {
             recordsHTML +=
                 "<article class=\"card\">" +
-                "<b>ORGANIZATION PAGE</b>" +
-                "<h3>" +
-                escapeHTML(page.title) +
-                "</h3>" +
-                "<p>" +
-                escapeHTML(page.content) +
-                "</p>" +
+                    "<b>ORGANIZATION PAGE</b>" +
+                    "<h3>" +
+                        escapeHTML(page.title) +
+                    "</h3>" +
+                    "<p>" +
+                        escapeHTML(page.content) +
+                    "</p>" +
+                    "<div class=\"owner-controls\" " +
+                        "data-page-id=\"" + page.id + "\">" +
+                        "<button " +
+                            "class=\"delete-page-button\" " +
+                            "data-page-id=\"" + page.id + "\" " +
+                            "hidden>" +
+                            "Delete Page" +
+                        "</button>" +
+                    "</div>" +
                 "</article>";
         }
 
         if (!recordsHTML) {
             recordsHTML =
                 "<div class=\"none\">" +
-                "No published information is available yet." +
+                    "No published information is available yet." +
                 "</div>";
         }
 
@@ -69,6 +78,9 @@ export async function onRequestGet(context) {
 
         const orgSlug =
             JSON.stringify(organization.slug);
+
+        const organizationId =
+            JSON.stringify(organization.id);
 
         const html =
 `<!DOCTYPE html>
@@ -95,6 +107,21 @@ export async function onRequestGet(context) {
         href="/styles.css"
     >
 
+    <style>
+
+        .owner-controls {
+            margin-top: 18px;
+        }
+
+        .delete-page-button {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+        }
+
+    </style>
+
 </head>
 
 <body>
@@ -104,8 +131,13 @@ export async function onRequestGet(context) {
     <div class="container nav">
 
         <a class="brand" href="/">
+
             <span class="mark">RA</span>
-            <span>Redmont Archives</span>
+
+            <span>
+                Redmont Archives
+            </span>
+
         </a>
 
         <nav>
@@ -142,9 +174,13 @@ export async function onRequestGet(context) {
             ORGANIZATION ARCHIVE
         </div>
 
-        <h1>${safeName}</h1>
+        <h1>
+            ${safeName}
+        </h1>
 
-        <p>${safeDescription}</p>
+        <p>
+            ${safeDescription}
+        </p>
 
     </div>
 
@@ -220,7 +256,34 @@ export async function onRequestGet(context) {
         </h2>
 
         <div class="grid">
+
             ${recordsHTML}
+
+        </div>
+
+        <div
+            id="organization-owner-controls"
+            class="card"
+            style="margin-top: 30px;"
+            hidden
+        >
+
+            <div class="eyebrow">
+                ORGANIZATION MANAGEMENT
+            </div>
+
+            <h2>
+                Owner Controls
+            </h2>
+
+            <button
+                id="delete-organization-button"
+                type="button"
+                hidden
+            >
+                Delete Organization
+            </button>
+
         </div>
 
     </div>
@@ -249,6 +312,8 @@ export async function onRequestGet(context) {
 
 const organizationSlug = ${orgSlug};
 
+const organizationId = ${organizationId};
+
 const form =
     document.getElementById("ai-form");
 
@@ -267,33 +332,93 @@ const label =
 const answer =
     document.getElementById("ai-answer");
 
-form.addEventListener("submit", async function(event) {
+const ownerControls =
+    document.getElementById(
+        "organization-owner-controls"
+    );
 
-    event.preventDefault();
+const deleteOrganizationButton =
+    document.getElementById(
+        "delete-organization-button"
+    );
 
-    const text =
-        question.value.trim();
-
-    if (!text) {
-        return;
-    }
-
-    button.disabled = true;
-    button.textContent = "Thinking...";
-
-    result.hidden = false;
-
-    label.textContent =
-        "ORGANIZATION AI";
-
-    answer.textContent =
-        "Checking your account...";
+async function checkOwnerStatus() {
 
     try {
 
         const response =
             await fetch(
-                "/api/organization-ai",
+                "/api/organization-owner?organization=" +
+                encodeURIComponent(
+                    organizationSlug
+                )
+            );
+
+        const data =
+            await response.json();
+
+        if (
+            data.authenticated &&
+            data.owner
+        ) {
+
+            ownerControls.hidden = false;
+
+            deleteOrganizationButton.hidden = false;
+
+            const deleteButtons =
+                document.querySelectorAll(
+                    ".delete-page-button"
+                );
+
+            deleteButtons.forEach(
+                function(button) {
+
+                    button.hidden = false;
+
+                    button.addEventListener(
+                        "click",
+                        function() {
+
+                            deletePage(
+                                button.dataset.pageId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Owner check failed:",
+            error
+        );
+
+    }
+
+}
+
+async function deletePage(pageId) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this page?"
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/api/organization-manage",
                 {
                     method: "POST",
 
@@ -303,11 +428,14 @@ form.addEventListener("submit", async function(event) {
                     },
 
                     body: JSON.stringify({
-                        organization:
-                            organizationSlug,
+                        organizationId:
+                            organizationId,
 
-                        query:
-                            text
+                        action:
+                            "delete_page",
+
+                        pageId:
+                            Number(pageId)
                     })
                 }
             );
@@ -315,51 +443,197 @@ form.addEventListener("submit", async function(event) {
         const data =
             await response.json();
 
-        if (response.status === 401) {
-
-            window.location.href =
-                "/login.html?returnTo=" +
-                encodeURIComponent(
-                    window.location.pathname
-                );
-
-            return;
-        }
-
         if (!response.ok) {
 
             throw new Error(
                 data.error ||
-                "Unable to complete AI request."
+                "Unable to delete page."
             );
+
         }
 
-        label.textContent =
-            "AI ANSWER";
-
-        answer.textContent =
-            data.answer ||
-            "No answer was returned.";
+        location.reload();
 
     } catch (error) {
 
-        console.error(error);
-
-        label.textContent =
-            "AI ERROR";
-
-        answer.textContent =
+        alert(
             error.message ||
-            "Unable to complete AI request.";
-
-    } finally {
-
-        button.disabled = false;
-        button.textContent = "Ask AI";
+            "Unable to delete page."
+        );
 
     }
 
-});
+}
+
+deleteOrganizationButton.addEventListener(
+    "click",
+    async function() {
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to permanently delete this organization?"
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/organization-manage",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            organizationId:
+                                organizationId,
+
+                            action:
+                                "delete_organization"
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to delete organization."
+                );
+
+            }
+
+            window.location.href =
+                "/organizations.html";
+
+        } catch (error) {
+
+            alert(
+                error.message ||
+                "Unable to delete organization."
+            );
+
+        }
+
+    }
+);
+
+form.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const text =
+            question.value.trim();
+
+        if (!text) {
+            return;
+        }
+
+        button.disabled = true;
+
+        button.textContent =
+            "Thinking...";
+
+        result.hidden = false;
+
+        label.textContent =
+            "ORGANIZATION AI";
+
+        answer.textContent =
+            "Checking your account...";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/organization-ai",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            organization:
+                                organizationSlug,
+
+                            query:
+                                text
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                response.status === 401
+            ) {
+
+                window.location.href =
+                    "/login.html?returnTo=" +
+                    encodeURIComponent(
+                        window.location.pathname
+                    );
+
+                return;
+
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to complete AI request."
+                );
+
+            }
+
+            label.textContent =
+                "AI ANSWER";
+
+            answer.textContent =
+                data.answer ||
+                "No answer was returned.";
+
+        } catch (error) {
+
+            console.error(error);
+
+            label.textContent =
+                "AI ERROR";
+
+            answer.textContent =
+                error.message ||
+                "Unable to complete AI request.";
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                "Ask AI";
+
+        }
+
+    }
+);
+
+checkOwnerStatus();
 
 </script>
 
@@ -371,6 +645,7 @@ form.addEventListener("submit", async function(event) {
             html,
             {
                 status: 200,
+
                 headers: {
                     "Content-Type":
                         "text/html; charset=UTF-8"
@@ -389,12 +664,14 @@ form.addEventListener("submit", async function(event) {
             "Unable to load organization.",
             {
                 status: 500,
+
                 headers: {
                     "Content-Type":
                         "text/plain; charset=UTF-8"
                 }
             }
         );
+
     }
 }
 
@@ -406,4 +683,5 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
