@@ -1,19 +1,29 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Log In | Redmont Archives</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Log In | Redmont Archives
+    </title>
 
     <meta
         name="description"
         content="Log in to your Redmont Archives account."
     >
 
-    <link rel="stylesheet" href="/styles.css">
+    <link
+        rel="stylesheet"
+        href="/styles.css"
+    >
 
 </head>
 
@@ -99,7 +109,8 @@
                         required
                     >
 
-                    <br><br>
+                    <br>
+                    <br>
 
                     <label for="password">
                         Password
@@ -114,7 +125,8 @@
                         required
                     >
 
-                    <br><br>
+                    <br>
+                    <br>
 
                     <button
                         type="submit"
@@ -125,7 +137,10 @@
 
                 </form>
 
-                <div id="result" hidden></div>
+                <div
+                    id="result"
+                    hidden
+                ></div>
 
             </div>
 
@@ -162,95 +177,162 @@ const result =
 const button =
     document.getElementById("login-button");
 
-form.addEventListener("submit", async function (event) {
 
-    event.preventDefault();
+/*
+ * Only accept local return paths.
+ *
+ * This prevents the login page from being used
+ * as an open redirect to another website.
+ */
+function getSafeReturnTo() {
 
-    const username =
-        document.getElementById("username").value.trim();
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
 
-    const password =
-        document.getElementById("password").value;
+    const returnTo =
+        params.get("returnTo");
 
-    result.hidden = true;
-    result.innerHTML = "";
+    if (!returnTo) {
+        return null;
+    }
 
-    button.disabled = true;
-    button.textContent = "Logging in...";
+    if (
+        !returnTo.startsWith("/") ||
+        returnTo.startsWith("//")
+    ) {
+        return null;
+    }
 
-    try {
+    return returnTo;
+}
 
-        const response =
-            await fetch("/api/login", {
 
-                method: "POST",
+form.addEventListener(
+    "submit",
+    async function(event) {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        event.preventDefault();
 
-                body: JSON.stringify({
-                    username,
-                    password
-                })
+        const username =
+            document
+                .getElementById("username")
+                .value
+                .trim();
 
-            });
+        const password =
+            document
+                .getElementById("password")
+                .value;
 
-        const data =
-            await response.json();
+        result.hidden = true;
+        result.innerHTML = "";
 
-        if (!response.ok) {
+        button.disabled = true;
+        button.textContent = "Logging in...";
 
-            throw new Error(
-                data.error || "Unable to log in."
-            );
+        try {
+
+            const response =
+                await fetch(
+                    "/api/login",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            username,
+                            password
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to log in."
+                );
+
+            }
+
+            /*
+             * Login succeeded.
+             *
+             * If the user came here from a protected
+             * action, send them back to that action.
+             */
+            const returnTo =
+                getSafeReturnTo();
+
+            if (returnTo) {
+
+                window.location.href =
+                    returnTo;
+
+                return;
+            }
+
+            /*
+             * Normal login with no return destination.
+             */
+            result.innerHTML =
+                "<br>" +
+                "<div class=\"eyebrow\">" +
+                "LOGIN SUCCESSFUL" +
+                "</div>" +
+                "<h3>" +
+                "Welcome back, " +
+                escapeHTML(
+                    data.user.username
+                ) +
+                "</h3>" +
+                "<p>" +
+                "You are now logged in to Redmont Archives." +
+                "</p>" +
+                "<p>" +
+                "<a href=\"/account.html\">" +
+                "Go to your account →" +
+                "</a>" +
+                "</p>";
+
+            result.hidden = false;
+
+        } catch (error) {
+
+            console.error(error);
+
+            result.innerHTML =
+                "<br>" +
+                "<div class=\"eyebrow\">" +
+                "LOGIN FAILED" +
+                "</div>" +
+                "<p>" +
+                escapeHTML(
+                    error.message
+                ) +
+                "</p>";
+
+            result.hidden = false;
+
+        } finally {
+
+            button.disabled = false;
+            button.textContent = "Log In";
 
         }
 
-        result.innerHTML = `
-            <br>
-
-            <div class="eyebrow">
-                LOGIN SUCCESSFUL
-            </div>
-
-            <h3>
-                Welcome back, ${escapeHTML(data.user.username)}
-            </h3>
-
-            <p>
-                You are now logged in to Redmont Archives.
-            </p>
-        `;
-
-        result.hidden = false;
-
-    } catch (error) {
-
-        console.error(error);
-
-        result.innerHTML = `
-            <br>
-
-            <div class="eyebrow">
-                LOGIN FAILED
-            </div>
-
-            <p>
-                ${escapeHTML(error.message)}
-            </p>
-        `;
-
-        result.hidden = false;
-
-    } finally {
-
-        button.disabled = false;
-        button.textContent = "Log In";
-
     }
+);
 
-});
 
 function escapeHTML(value) {
 
@@ -268,3 +350,4 @@ function escapeHTML(value) {
 </body>
 
 </html>
+```
