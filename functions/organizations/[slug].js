@@ -154,6 +154,10 @@ export async function onRequestGet(context) {
                 Archive
             </a>
 
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
             <a href="/#categories">
                 Categories
             </a>
@@ -191,9 +195,60 @@ export async function onRequestGet(context) {
 
             <div class="quick">
 
-                <a href="/create-page.html?organization=${encodeURIComponent(organization.slug)}">
+                <a href="/create-page.html?organization=${encodeURIComponent(
+                    organization.slug
+                )}">
                     Create Page
                 </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="section">
+
+        <div class="container">
+
+            <div class="card">
+
+                <div class="eyebrow">
+                    ORGANIZATION AI
+                </div>
+
+                <h2>
+                    Ask about this organization
+                </h2>
+
+                <p>
+                    Ask a question about information published in this
+                    organization's Redmont Archives records.
+                </p>
+
+                <form id="ai-form">
+
+                    <input
+                        id="ai-question"
+                        type="text"
+                        maxlength="1000"
+                        placeholder="Ask a question..."
+                        autocomplete="off"
+                        required
+                    >
+
+                    <br><br>
+
+                    <button
+                        type="submit"
+                        id="ai-button"
+                    >
+                        Ask AI
+                    </button>
+
+                </form>
+
+                <div id="ai-result" hidden></div>
 
             </div>
 
@@ -278,6 +333,139 @@ export async function onRequestGet(context) {
     </div>
 
 </footer>
+
+<script>
+
+const aiForm =
+    document.getElementById("ai-form");
+
+const aiQuestion =
+    document.getElementById("ai-question");
+
+const aiButton =
+    document.getElementById("ai-button");
+
+const aiResult =
+    document.getElementById("ai-result");
+
+aiForm.addEventListener(
+    "submit",
+    async function (event) {
+
+        event.preventDefault();
+
+        const query =
+            aiQuestion.value.trim();
+
+        if (!query) {
+            return;
+        }
+
+        aiButton.disabled = true;
+        aiButton.textContent = "Thinking...";
+
+        aiResult.hidden = false;
+
+        aiResult.innerHTML = `
+            <br>
+            <div class="eyebrow">
+                ORGANIZATION AI
+            </div>
+            <p>
+                Searching ${escapeHTML(
+                    ${JSON.stringify(organization.name)}
+                )} records...
+            </p>
+        `;
+
+        try {
+
+            const response =
+                await fetch("/api/organization-ai", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        organization:
+                            ${JSON.stringify(organization.slug)},
+                        query
+                    })
+
+                });
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to complete AI request."
+                );
+
+            }
+
+            aiResult.innerHTML = `
+                <br>
+
+                <div class="eyebrow">
+                    AI ANSWER
+                </div>
+
+                <p>
+                    ${formatAnswer(data.answer)}
+                </p>
+            `;
+
+        } catch (error) {
+
+            console.error(error);
+
+            aiResult.innerHTML = `
+                <br>
+
+                <div class="eyebrow">
+                    AI ERROR
+                </div>
+
+                <p>
+                    ${escapeHTML(error.message)}
+                </p>
+            `;
+
+        } finally {
+
+            aiButton.disabled = false;
+            aiButton.textContent = "Ask AI";
+
+        }
+
+    }
+);
+
+function formatAnswer(value) {
+
+    return escapeHTML(value)
+        .replace(/\n/g, "<br>");
+
+}
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+</script>
 
 </body>
 </html>
