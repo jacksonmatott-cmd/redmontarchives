@@ -53,15 +53,13 @@ export async function onRequestGet(context) {
                 "No organization description has been published."
             );
 
-        const organizationSlugJSON =
+        const orgSlugJSON =
             JSON.stringify(organization.slug);
-
-        const organizationNameJSON =
-            JSON.stringify(organization.name);
 
         let pageHTML = "";
 
         for (const page of pages) {
+
             pageHTML += `
                 <article class="card">
 
@@ -82,11 +80,13 @@ export async function onRequestGet(context) {
         }
 
         if (!pageHTML) {
+
             pageHTML = `
                 <div class="none">
                     No published information is available yet.
                 </div>
             `;
+
         }
 
         const html = `
@@ -111,7 +111,10 @@ export async function onRequestGet(context) {
         content="${organizationDescription}"
     >
 
-    <link rel="stylesheet" href="/styles.css">
+    <link
+        rel="stylesheet"
+        href="/styles.css"
+    >
 
 </head>
 
@@ -212,7 +215,8 @@ export async function onRequestGet(context) {
                         required
                     >
 
-                    <br><br>
+                    <br>
+                    <br>
 
                     <button
                         id="ai-button"
@@ -223,7 +227,21 @@ export async function onRequestGet(context) {
 
                 </form>
 
-                <div id="ai-result" hidden></div>
+                <div
+                    id="ai-result"
+                    hidden
+                >
+
+                    <div
+                        id="ai-label"
+                        class="eyebrow"
+                    ></div>
+
+                    <p
+                        id="ai-answer"
+                    ></p>
+
+                </div>
 
             </div>
 
@@ -308,29 +326,22 @@ export async function onRequestGet(context) {
 
 <script>
 
-const organizationSlug = ${organizationSlugJSON};
-const organizationName = ${organizationNameJSON};
+const organizationSlug = ${orgSlugJSON};
 
-const aiForm =
-    document.getElementById("ai-form");
-
-const aiQuestion =
-    document.getElementById("ai-question");
-
-const aiButton =
-    document.getElementById("ai-button");
-
-const aiResult =
-    document.getElementById("ai-result");
+const aiForm = document.getElementById("ai-form");
+const aiQuestion = document.getElementById("ai-question");
+const aiButton = document.getElementById("ai-button");
+const aiResult = document.getElementById("ai-result");
+const aiLabel = document.getElementById("ai-label");
+const aiAnswer = document.getElementById("ai-answer");
 
 aiForm.addEventListener("submit", async function(event) {
 
     event.preventDefault();
 
-    const query =
-        aiQuestion.value.trim();
+    const question = aiQuestion.value.trim();
 
-    if (!query) {
+    if (!question) {
         return;
     }
 
@@ -338,43 +349,28 @@ aiForm.addEventListener("submit", async function(event) {
     aiButton.textContent = "Thinking...";
 
     aiResult.hidden = false;
-
-    aiResult.innerHTML =
-        "<br>" +
-        "<div class=\\"eyebrow\\">" +
-        "ORGANIZATION AI" +
-        "</div>" +
-        "<p>" +
-        "Searching " +
-        escapeHTML(organizationName) +
-        " records..." +
-        "</p>";
+    aiLabel.textContent = "ORGANIZATION AI";
+    aiAnswer.textContent = "Searching organization records...";
 
     try {
 
-        const response =
-            await fetch(
-                "/api/organization-ai",
-                {
-                    method: "POST",
+        const response = await fetch(
+            "/api/organization-ai",
+            {
+                method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-                    body: JSON.stringify({
-                        organization:
-                            organizationSlug,
+                body: JSON.stringify({
+                    organization: organizationSlug,
+                    query: question
+                })
+            }
+        );
 
-                        query:
-                            query
-                    })
-                }
-            );
-
-        const data =
-            await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
 
@@ -385,48 +381,18 @@ aiForm.addEventListener("submit", async function(event) {
 
         }
 
-        aiResult.innerHTML =
-            "<br>" +
-            "<div class=\\"eyebrow\\">" +
-            "AI ANSWER" +
-            "</div>" +
-            "<p>" +
-            formatAnswer(data.answer) +
-            "</p>";
+        aiLabel.textContent = "AI ANSWER";
+        aiAnswer.textContent = data.answer || "No answer was returned.";
 
     } catch (error) {
 
-        console.error(error);
+        console.error("Organization AI:", error);
 
-        if (error.message === "Login or organization access is required.") {
+        aiLabel.textContent = "AI ERROR";
 
-    aiResult.innerHTML =
-        "<br>" +
-        "<div class=\"eyebrow\">" +
-        "AI ACCESS REQUIRED" +
-        "</div>" +
-        "<p>" +
-        "AI requests require a Redmont Archives account " +
-        "or a valid organization archive context." +
-        "</p>" +
-        "<p>" +
-        "<a href=\"/login.html\">Log in →</a>" +
-        " &nbsp; " +
-        "<a href=\"/organizations.html\">Browse organizations →</a>" +
-        "</p>";
-
-} else {
-
-    aiResult.innerHTML =
-        "<br>" +
-        "<div class=\"eyebrow\">" +
-        "AI ERROR" +
-        "</div>" +
-        "<p>" +
-        escapeHTML(error.message) +
-        "</p>";
-
-}
+        aiAnswer.textContent =
+            error.message ||
+            "Unable to complete AI request.";
 
     } finally {
 
@@ -437,36 +403,21 @@ aiForm.addEventListener("submit", async function(event) {
 
 });
 
-function formatAnswer(value) {
-
-    return escapeHTML(value)
-        .replace(/\\n/g, "<br>");
-
-}
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
 </script>
 
 </body>
+
 </html>
         `;
 
         return new Response(html, {
             status: 200,
+
             headers: {
                 "Content-Type":
                     "text/html; charset=UTF-8"
             }
+
         });
 
     } catch (error) {
@@ -553,6 +504,7 @@ function escapeHTML(value) {
             `,
             {
                 status: 500,
+
                 headers: {
                     "Content-Type":
                         "text/html; charset=UTF-8"
