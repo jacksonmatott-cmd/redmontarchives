@@ -1,9 +1,15 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Redmont Archives</title>
 
@@ -12,7 +18,17 @@
         content="Redmont Archives — a public records and information archive."
     >
 
-    <link rel="stylesheet" href="styles.css">
+    <link
+        rel="icon"
+        href="/logo.svg"
+        type="image/svg+xml"
+    >
+
+    <link
+        rel="stylesheet"
+        href="styles.css"
+    >
+
 </head>
 
 <body>
@@ -21,12 +37,24 @@
 
     <div class="container nav">
 
-        <a class="brand" href="/">
-            <span class="mark">RA</span>
-            <span>Redmont Archives</span>
+        <a
+            class="brand"
+            href="/"
+        >
+
+            <img
+                src="/logo.svg"
+                alt="Redmont Archives logo"
+                class="logo"
+            >
+
+            <span>
+                Redmont Archives
+            </span>
+
         </a>
 
-        <nav id="main-nav">
+        <nav>
 
             <a href="#records">
                 Records
@@ -43,18 +71,6 @@
             <a href="#about">
                 About
             </a>
-
-            <span id="account-links">
-
-                <a href="/login.html">
-                    Log In
-                </a>
-
-                <a href="/register.html">
-                    Create Account
-                </a>
-
-            </span>
 
         </nav>
 
@@ -119,7 +135,10 @@
 
 </section>
 
-<section id="records" class="section">
+<section
+    id="records"
+    class="section"
+>
 
     <div class="container">
 
@@ -143,7 +162,10 @@
 
         </div>
 
-        <div id="grid" class="grid">
+        <div
+            id="grid"
+            class="grid"
+        >
 
             <article
                 class="card"
@@ -183,7 +205,8 @@
                 </h3>
 
                 <p>
-                    Important laws, bills, amendments, and votes.
+                    Important laws, bills, amendments,
+                    and votes.
                 </p>
 
                 <a href="#">
@@ -278,8 +301,8 @@
                 </h3>
 
                 <p>
-                    A chronological record of notable events
-                    and developments.
+                    A chronological record of notable
+                    events and developments.
                 </p>
 
                 <a href="#">
@@ -290,7 +313,11 @@
 
         </div>
 
-        <div id="none" hidden class="none">
+        <div
+            id="none"
+            hidden
+            class="none"
+        >
             No records matched your search.
         </div>
 
@@ -298,7 +325,10 @@
 
 </section>
 
-<section id="categories" class="section alt">
+<section
+    id="categories"
+    class="section alt"
+>
 
     <div class="container">
 
@@ -312,14 +342,37 @@
 
         <div class="categories">
 
-            <span>Government</span>
-            <span>Legislation</span>
-            <span>Business</span>
-            <span>Elections</span>
-            <span>People</span>
-            <span>Events</span>
-            <span>Organizations</span>
-            <span>Other Records</span>
+            <span>
+                Government
+            </span>
+
+            <span>
+                Legislation
+            </span>
+
+            <span>
+                Business
+            </span>
+
+            <span>
+                Elections
+            </span>
+
+            <span>
+                People
+            </span>
+
+            <span>
+                Events
+            </span>
+
+            <span>
+                Organizations
+            </span>
+
+            <span>
+                Other Records
+            </span>
 
         </div>
 
@@ -327,7 +380,10 @@
 
 </section>
 
-<section id="about" class="section">
+<section
+    id="about"
+    class="section"
+>
 
     <div class="container about">
 
@@ -344,11 +400,11 @@
         </div>
 
         <p>
-            Redmont Archives is designed to make historical and
-            public information easier to find, organize, verify,
-            and reference. Organizations can publish their own
-            public information while Redmont maintains a broader
-            archive of records.
+            Redmont Archives is designed to make historical
+            and public information easier to find, organize,
+            verify, and reference. Organizations can publish
+            their own public information while Redmont maintains
+            a broader archive of records.
         </p>
 
     </div>
@@ -375,103 +431,7 @@
 
 <script src="script.js"></script>
 
-<script>
-
-async function updateAccountNavigation() {
-
-    const accountLinks =
-        document.getElementById("account-links");
-
-    try {
-
-        const response =
-            await fetch("/api/me");
-
-        const data =
-            await response.json();
-
-        if (data.authenticated) {
-
-            accountLinks.innerHTML = `
-
-                <a href="/account.html">
-                    Account
-                </a>
-
-                <a href="#" id="logout-link">
-                    Log Out
-                </a>
-
-            `;
-
-            document
-                .getElementById("logout-link")
-                .addEventListener("click", logout);
-
-        } else {
-
-            accountLinks.innerHTML = `
-
-                <a href="/login.html">
-                    Log In
-                </a>
-
-                <a href="/register.html">
-                    Create Account
-                </a>
-
-            `;
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Unable to load account status:",
-            error
-        );
-
-    }
-
-}
-
-async function logout(event) {
-
-    event.preventDefault();
-
-    try {
-
-        const response =
-            await fetch("/api/logout", {
-                method: "POST"
-            });
-
-        const data =
-            await response.json();
-
-        if (!response.ok || !data.success) {
-
-            throw new Error(
-                data.error || "Unable to log out."
-            );
-
-        }
-
-        window.location.reload();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Unable to log out.");
-
-    }
-
-}
-
-updateAccountNavigation();
-
-</script>
-
 </body>
+
 </html>
+```
