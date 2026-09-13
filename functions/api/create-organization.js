@@ -44,19 +44,10 @@ export async function onRequestPost(context) {
             );
         }
 
-        const expiresAt =
-            new Date(session.expires_at);
-
-        if (expiresAt <= new Date()) {
-
-            await context.env.DB
-                .prepare(`
-                    DELETE FROM sessions
-                    WHERE id = ?
-                `)
-                .bind(session.id)
-                .run();
-
+        if (
+            new Date(session.expires_at) <=
+            new Date()
+        ) {
             return Response.json(
                 {
                     error: "Your session has expired.",
@@ -87,7 +78,8 @@ export async function onRequestPost(context) {
         if (!name) {
             return Response.json(
                 {
-                    error: "Organization name is required."
+                    error:
+                        "Organization name is required."
                 },
                 { status: 400 }
             );
@@ -96,7 +88,8 @@ export async function onRequestPost(context) {
         if (name.length > 100) {
             return Response.json(
                 {
-                    error: "Organization name is too long."
+                    error:
+                        "Organization name is too long."
                 },
                 { status: 400 }
             );
@@ -105,17 +98,16 @@ export async function onRequestPost(context) {
         if (description.length > 1000) {
             return Response.json(
                 {
-                    error: "Organization description is too long."
+                    error:
+                        "Organization description is too long."
                 },
                 { status: 400 }
             );
         }
 
-        let slug = requestedSlug;
-
-        if (!slug) {
-            slug = createSlug(name);
-        }
+        const slug =
+            requestedSlug ||
+            createSlug(name);
 
         if (
             !/^[a-z0-9-]+$/.test(slug) ||
@@ -151,6 +143,10 @@ export async function onRequestPost(context) {
             );
         }
 
+        /*
+         * Create the organization with the logged-in
+         * user as the permanent owner.
+         */
         const result =
             await context.env.DB
                 .prepare(`
@@ -173,6 +169,25 @@ export async function onRequestPost(context) {
         const organizationId =
             result.meta.last_row_id;
 
+        /*
+         * Automatically enroll the creator as
+         * an active member.
+         */
+        await context.env.DB
+            .prepare(`
+                INSERT INTO organization_members (
+                    organization_id,
+                    user_id,
+                    status
+                )
+                VALUES (?, ?, 'active')
+            `)
+            .bind(
+                organizationId,
+                session.user_id
+            )
+            .run();
+
         return Response.json(
             {
                 success: true,
@@ -182,7 +197,8 @@ export async function onRequestPost(context) {
                     name,
                     slug,
                     description,
-                    owner_user_id: session.user_id
+                    owner_user_id:
+                        session.user_id
                 }
             },
             { status: 201 }
