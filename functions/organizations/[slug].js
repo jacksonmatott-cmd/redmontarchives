@@ -398,14 +398,35 @@ aiForm.addEventListener("submit", async function(event) {
 
         console.error(error);
 
-        aiResult.innerHTML =
-            "<br>" +
-            "<div class=\\"eyebrow\\">" +
-            "AI ERROR" +
-            "</div>" +
-            "<p>" +
-            escapeHTML(error.message) +
-            "</p>";
+        if (error.message === "Login or organization access is required.") {
+
+    aiResult.innerHTML =
+        "<br>" +
+        "<div class=\"eyebrow\">" +
+        "AI ACCESS REQUIRED" +
+        "</div>" +
+        "<p>" +
+        "AI requests require a Redmont Archives account " +
+        "or a valid organization archive context." +
+        "</p>" +
+        "<p>" +
+        "<a href=\"/login.html\">Log in →</a>" +
+        " &nbsp; " +
+        "<a href=\"/organizations.html\">Browse organizations →</a>" +
+        "</p>";
+
+} else {
+
+    aiResult.innerHTML =
+        "<br>" +
+        "<div class=\"eyebrow\">" +
+        "AI ERROR" +
+        "</div>" +
+        "<p>" +
+        escapeHTML(error.message) +
+        "</p>";
+
+}
 
     } finally {
 
