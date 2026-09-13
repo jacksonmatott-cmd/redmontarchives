@@ -96,6 +96,21 @@ export async function onRequestGet(context) {
             .bind(organization.id)
             .all();
 
+        const organizationName =
+            escapeHTML(organization.name);
+
+        const organizationDescription =
+            escapeHTML(
+                organization.description ||
+                "No organization description has been published."
+            );
+
+        const organizationSlug =
+            JSON.stringify(organization.slug);
+
+        const organizationNameJSON =
+            JSON.stringify(organization.name);
+
         const pageHTML = pages.results.map(page => `
             <article class="card">
 
@@ -123,14 +138,11 @@ export async function onRequestGet(context) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>${escapeHTML(organization.name)} | Redmont Archives</title>
+    <title>${organizationName} | Redmont Archives</title>
 
     <meta
         name="description"
-        content="${escapeHTML(
-            organization.description ||
-            "Organization archive on Redmont Archives."
-        )}"
+        content="${organizationDescription}"
     >
 
     <link rel="stylesheet" href="/styles.css">
@@ -183,14 +195,11 @@ export async function onRequestGet(context) {
             </div>
 
             <h1>
-                ${escapeHTML(organization.name)}
+                ${organizationName}
             </h1>
 
             <p>
-                ${escapeHTML(
-                    organization.description ||
-                    "No organization description has been published."
-                )}
+                ${organizationDescription}
             </p>
 
             <div class="quick">
@@ -348,6 +357,12 @@ const aiButton =
 const aiResult =
     document.getElementById("ai-result");
 
+const organizationSlug =
+    ${organizationSlug};
+
+const organizationName =
+    ${organizationNameJSON};
+
 aiForm.addEventListener(
     "submit",
     async function (event) {
@@ -366,17 +381,17 @@ aiForm.addEventListener(
 
         aiResult.hidden = false;
 
-        aiResult.innerHTML = `
+        aiResult.innerHTML = \`
             <br>
+
             <div class="eyebrow">
                 ORGANIZATION AI
             </div>
+
             <p>
-                Searching ${escapeHTML(
-                    ${JSON.stringify(organization.name)}
-                )} records...
+                Searching \${escapeHTML(organizationName)} records...
             </p>
-        `;
+        \`;
 
         try {
 
@@ -390,8 +405,7 @@ aiForm.addEventListener(
                     },
 
                     body: JSON.stringify({
-                        organization:
-                            ${JSON.stringify(organization.slug)},
+                        organization: organizationSlug,
                         query
                     })
 
@@ -409,7 +423,7 @@ aiForm.addEventListener(
 
             }
 
-            aiResult.innerHTML = `
+            aiResult.innerHTML = \`
                 <br>
 
                 <div class="eyebrow">
@@ -417,15 +431,15 @@ aiForm.addEventListener(
                 </div>
 
                 <p>
-                    ${formatAnswer(data.answer)}
+                    \${formatAnswer(data.answer)}
                 </p>
-            `;
+            \`;
 
         } catch (error) {
 
             console.error(error);
 
-            aiResult.innerHTML = `
+            aiResult.innerHTML = \`
                 <br>
 
                 <div class="eyebrow">
@@ -433,9 +447,9 @@ aiForm.addEventListener(
                 </div>
 
                 <p>
-                    ${escapeHTML(error.message)}
+                    \${escapeHTML(error.message)}
                 </p>
-            `;
+            \`;
 
         } finally {
 
@@ -450,7 +464,7 @@ aiForm.addEventListener(
 function formatAnswer(value) {
 
     return escapeHTML(value)
-        .replace(/\n/g, "<br>");
+        .replace(/\\n/g, "<br>");
 
 }
 
@@ -468,6 +482,7 @@ function escapeHTML(value) {
 </script>
 
 </body>
+
 </html>
         `;
 
@@ -479,7 +494,10 @@ function escapeHTML(value) {
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "Organization page error:",
+            error
+        );
 
         return new Response(
             `
@@ -554,15 +572,4 @@ function escapeHTML(value) {
             }
         );
     }
-}
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
 }
