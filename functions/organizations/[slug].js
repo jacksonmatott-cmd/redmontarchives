@@ -53,13 +53,12 @@ export async function onRequestGet(context) {
                 "No organization description has been published."
             );
 
-        const orgSlugJSON =
+        const organizationSlugJSON =
             JSON.stringify(organization.slug);
 
         let pageHTML = "";
 
         for (const page of pages) {
-
             pageHTML += `
                 <article class="card">
 
@@ -80,13 +79,11 @@ export async function onRequestGet(context) {
         }
 
         if (!pageHTML) {
-
             pageHTML = `
                 <div class="none">
                     No published information is available yet.
                 </div>
             `;
-
         }
 
         const html = `
@@ -326,82 +323,146 @@ export async function onRequestGet(context) {
 
 <script>
 
-const organizationSlug = ${orgSlugJSON};
+const organizationSlug =
+    ${organizationSlugJSON};
 
-const aiForm = document.getElementById("ai-form");
-const aiQuestion = document.getElementById("ai-question");
-const aiButton = document.getElementById("ai-button");
-const aiResult = document.getElementById("ai-result");
-const aiLabel = document.getElementById("ai-label");
-const aiAnswer = document.getElementById("ai-answer");
+const aiForm =
+    document.getElementById("ai-form");
 
-aiForm.addEventListener("submit", async function(event) {
+const aiQuestion =
+    document.getElementById("ai-question");
 
-    event.preventDefault();
+const aiButton =
+    document.getElementById("ai-button");
 
-    const question = aiQuestion.value.trim();
+const aiResult =
+    document.getElementById("ai-result");
 
-    if (!question) {
-        return;
-    }
+const aiLabel =
+    document.getElementById("ai-label");
 
-    aiButton.disabled = true;
-    aiButton.textContent = "Thinking...";
+const aiAnswer =
+    document.getElementById("ai-answer");
 
-    aiResult.hidden = false;
-    aiLabel.textContent = "ORGANIZATION AI";
-    aiAnswer.textContent = "Searching organization records...";
+aiForm.addEventListener(
+    "submit",
+    async function(event) {
 
-    try {
+        event.preventDefault();
 
-        const response = await fetch(
-            "/api/organization-ai",
-            {
-                method: "POST",
+        const question =
+            aiQuestion.value.trim();
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+        if (!question) {
+            return;
+        }
 
-                body: JSON.stringify({
-                    organization: organizationSlug,
-                    query: question
-                })
+        aiButton.disabled = true;
+        aiButton.textContent = "Thinking...";
+
+        aiResult.hidden = false;
+
+        aiLabel.textContent =
+            "ORGANIZATION AI";
+
+        aiAnswer.textContent =
+            "Searching organization records...";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/organization-ai",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            organization:
+                                organizationSlug,
+
+                            query:
+                                question
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (
+                response.status === 401 &&
+                data.redirect
+            ) {
+
+                const returnTo =
+                    window.location.pathname +
+                    window.location.search;
+
+                window.location.href =
+                    data.redirect +
+                    "?returnTo=" +
+                    encodeURIComponent(
+                        returnTo
+                    );
+
+                return;
             }
-        );
 
-        const data = await response.json();
+            if (!response.ok) {
 
-        if (!response.ok) {
+                throw new Error(
+                    data.error ||
+                    "Unable to complete AI request."
+                );
 
-            throw new Error(
-                data.error ||
-                "Unable to complete AI request."
+            }
+
+            aiLabel.textContent =
+                "AI ANSWER";
+
+            aiAnswer.textContent =
+                data.answer ||
+                "No answer was returned.";
+
+        } catch (error) {
+
+            console.error(
+                "Organization AI:",
+                error
             );
+
+            aiLabel.textContent =
+                "AI ERROR";
+
+            aiAnswer.textContent =
+                error.message ||
+                "Unable to complete AI request.";
+
+        } finally {
+
+            aiButton.disabled = false;
+            aiButton.textContent = "Ask AI";
 
         }
 
-        aiLabel.textContent = "AI ANSWER";
-        aiAnswer.textContent = data.answer || "No answer was returned.";
-
-    } catch (error) {
-
-        console.error("Organization AI:", error);
-
-        aiLabel.textContent = "AI ERROR";
-
-        aiAnswer.textContent =
-            error.message ||
-            "Unable to complete AI request.";
-
-    } finally {
-
-        aiButton.disabled = false;
-        aiButton.textContent = "Ask AI";
-
     }
+);
 
-});
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
 
 </script>
 
@@ -410,15 +471,17 @@ aiForm.addEventListener("submit", async function(event) {
 </html>
         `;
 
-        return new Response(html, {
-            status: 200,
+        return new Response(
+            html,
+            {
+                status: 200,
 
-            headers: {
-                "Content-Type":
-                    "text/html; charset=UTF-8"
+                headers: {
+                    "Content-Type":
+                        "text/html; charset=UTF-8"
+                }
             }
-
-        });
+        );
 
     } catch (error) {
 
@@ -512,15 +575,4 @@ aiForm.addEventListener("submit", async function(event) {
             }
         );
     }
-}
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
 }
