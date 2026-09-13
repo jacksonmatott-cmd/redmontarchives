@@ -13,6 +13,7 @@
 <body>
 
 <header>
+
     <div class="container nav">
 
         <a class="brand" href="/">
@@ -27,11 +28,13 @@
         </nav>
 
     </div>
+
 </header>
 
 <main>
 
     <section class="hero">
+
         <div class="container hero-inner">
 
             <div class="eyebrow">
@@ -47,6 +50,7 @@
             </p>
 
         </div>
+
     </section>
 
     <section class="section">
@@ -139,6 +143,7 @@
                         <option value="published">
                             Published
                         </option>
+
                     </select>
 
                     <br><br>
@@ -176,6 +181,7 @@
 </footer>
 
 <script>
+
 const form = document.getElementById("page-form");
 const result = document.getElementById("result");
 const button = document.getElementById("create-button");
@@ -226,6 +232,23 @@ async function loadOrganizations() {
 
         });
 
+        const params = new URLSearchParams(window.location.search);
+        const requestedSlug = params.get("organization");
+
+        if (requestedSlug) {
+
+            const matchingOrganization =
+                data.organizations.find(
+                    organization =>
+                        organization.slug === requestedSlug
+                );
+
+            if (matchingOrganization) {
+                organizationSelect.value = matchingOrganization.id;
+            }
+
+        }
+
     } catch (error) {
 
         console.error(error);
@@ -237,6 +260,7 @@ async function loadOrganizations() {
         `;
 
     }
+
 }
 
 form.addEventListener("submit", async function (event) {
@@ -360,6 +384,7 @@ function escapeHTML(value) {
 }
 
 loadOrganizations();
+
 </script>
 
 </body>
