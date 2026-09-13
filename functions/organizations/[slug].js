@@ -48,15 +48,20 @@ export async function onRequestGet(context) {
                     "<p>" +
                         escapeHTML(page.content) +
                     "</p>" +
-                    "<div class=\"owner-controls\" " +
-                        "data-page-id=\"" + page.id + "\">" +
+
+                    "<div " +
+                        "class=\"owner-page-controls\" " +
+                        "hidden>" +
+
                         "<button " +
                             "class=\"delete-page-button\" " +
-                            "data-page-id=\"" + page.id + "\" " +
-                            "hidden>" +
+                            "data-page-id=\"" + page.id + "\"" +
+                            " type=\"button\">" +
                             "Delete Page" +
                         "</button>" +
+
                     "</div>" +
+
                 "</article>";
         }
 
@@ -110,14 +115,44 @@ export async function onRequestGet(context) {
     <style>
 
         .owner-controls {
-            margin-top: 18px;
+            margin-top: 30px;
         }
 
+        .owner-controls h3 {
+            margin-bottom: 15px;
+        }
+
+        .owner-controls input,
+        .owner-controls textarea {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .owner-controls textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .owner-controls button,
         .delete-page-button {
             border: 0;
             border-radius: 8px;
             padding: 10px 14px;
             cursor: pointer;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .owner-page-controls {
+            margin-top: 15px;
+        }
+
+        .owner-message {
+            margin-top: 12px;
         }
 
     </style>
@@ -263,8 +298,7 @@ export async function onRequestGet(context) {
 
         <div
             id="organization-owner-controls"
-            class="card"
-            style="margin-top: 30px;"
+            class="card owner-controls"
             hidden
         >
 
@@ -276,10 +310,55 @@ export async function onRequestGet(context) {
                 Owner Controls
             </h2>
 
+            <h3>
+                Add Page
+            </h3>
+
+            <form id="add-page-form">
+
+                <input
+                    id="page-title"
+                    type="text"
+                    maxlength="200"
+                    placeholder="Page title"
+                    required
+                >
+
+                <input
+                    id="page-slug"
+                    type="text"
+                    maxlength="100"
+                    placeholder="Page slug, e.g. about"
+                    required
+                >
+
+                <textarea
+                    id="page-content"
+                    maxlength="10000"
+                    placeholder="Page content"
+                    required
+                ></textarea>
+
+                <button
+                    type="submit"
+                    id="add-page-button"
+                >
+                    Add Page
+                </button>
+
+            </form>
+
+            <div
+                id="page-message"
+                class="owner-message"
+                hidden
+            ></div>
+
+            <br>
+
             <button
                 id="delete-organization-button"
                 type="button"
-                hidden
             >
                 Delete Organization
             </button>
@@ -342,6 +421,21 @@ const deleteOrganizationButton =
         "delete-organization-button"
     );
 
+const addPageForm =
+    document.getElementById(
+        "add-page-form"
+    );
+
+const addPageButton =
+    document.getElementById(
+        "add-page-button"
+    );
+
+const pageMessage =
+    document.getElementById(
+        "page-message"
+    );
+
 async function checkOwnerStatus() {
 
     try {
@@ -364,7 +458,18 @@ async function checkOwnerStatus() {
 
             ownerControls.hidden = false;
 
-            deleteOrganizationButton.hidden = false;
+            const pageControls =
+                document.querySelectorAll(
+                    ".owner-page-controls"
+                );
+
+            pageControls.forEach(
+                function(control) {
+
+                    control.hidden = false;
+
+                }
+            );
 
             const deleteButtons =
                 document.querySelectorAll(
@@ -373,8 +478,6 @@ async function checkOwnerStatus() {
 
             deleteButtons.forEach(
                 function(button) {
-
-                    button.hidden = false;
 
                     button.addEventListener(
                         "click",
@@ -464,6 +567,109 @@ async function deletePage(pageId) {
     }
 
 }
+
+addPageForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const title =
+            document
+                .getElementById("page-title")
+                .value
+                .trim();
+
+        const slug =
+            document
+                .getElementById("page-slug")
+                .value
+                .trim();
+
+        const content =
+            document
+                .getElementById("page-content")
+                .value
+                .trim();
+
+        if (
+            !title ||
+            !slug ||
+            !content
+        ) {
+            return;
+        }
+
+        addPageButton.disabled = true;
+
+        addPageButton.textContent =
+            "Creating...";
+
+        pageMessage.hidden = false;
+
+        pageMessage.textContent =
+            "Creating page...";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/organization-page-create",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            organizationId:
+                                organizationId,
+
+                            title:
+                                title,
+
+                            slug:
+                                slug,
+
+                            content:
+                                content
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to create page."
+                );
+
+            }
+
+            location.reload();
+
+        } catch (error) {
+
+            pageMessage.textContent =
+                error.message ||
+                "Unable to create page.";
+
+        } finally {
+
+            addPageButton.disabled = false;
+
+            addPageButton.textContent =
+                "Add Page";
+
+        }
+
+    }
+);
 
 deleteOrganizationButton.addEventListener(
     "click",
