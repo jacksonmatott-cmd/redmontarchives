@@ -394,25 +394,6 @@ aiForm.addEventListener(
             const data =
                 await response.json();
 
-            if (
-                response.status === 401 &&
-                data.redirect
-            ) {
-
-                const returnTo =
-                    window.location.pathname +
-                    window.location.search;
-
-                window.location.href =
-                    data.redirect +
-                    "?returnTo=" +
-                    encodeURIComponent(
-                        returnTo
-                    );
-
-                return;
-            }
-
             if (!response.ok) {
 
                 throw new Error(
@@ -575,4 +556,15 @@ function escapeHTML(value) {
             }
         );
     }
+}
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
 }
