@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,6 +27,40 @@
         rel="stylesheet"
         href="styles.css"
     >
+
+    <style>
+
+        #create-record-section {
+            display: none;
+        }
+
+        #create-record-section input,
+        #create-record-section textarea,
+        #create-record-section select {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        #create-record-section textarea {
+            min-height: 160px;
+            resize: vertical;
+        }
+
+        #create-record-button {
+            display: none;
+        }
+
+        #record-message {
+            margin-top: 15px;
+        }
+
+    </style>
 
 </head>
 
@@ -80,7 +113,7 @@
                 Log In
             </a>
 
-            <a href="/signup.html">
+            <a href="/register.html">
                 Create Account
             </a>
 
@@ -117,9 +150,22 @@
                 aria-label="Search the archives"
             >
 
-            <button onclick="searchRecords()">
+            <button
+                onclick="searchRecords()"
+            >
                 Search
             </button>
+
+        </div>
+
+        <div
+            id="create-record-button"
+            class="quick"
+        >
+
+            <a href="#create-record-section">
+                Create Record
+            </a>
 
         </div>
 
@@ -338,6 +384,120 @@
 </section>
 
 <section
+    id="create-record-section"
+    class="section"
+>
+
+    <div class="container">
+
+        <div class="card">
+
+            <div class="eyebrow">
+                ARCHIVE MANAGEMENT
+            </div>
+
+            <h2>
+                Create Archive Record
+            </h2>
+
+            <p>
+                This form is available only to the authorized
+                Redmont Archives archive administrator.
+            </p>
+
+            <form id="create-record-form">
+
+                <label for="record-title">
+                    Record Title
+                </label>
+
+                <input
+                    id="record-title"
+                    type="text"
+                    maxlength="200"
+                    placeholder="Enter record title"
+                    required
+                >
+
+                <label for="record-category">
+                    Category
+                </label>
+
+                <select
+                    id="record-category"
+                    required
+                >
+
+                    <option value="">
+                        Select a category
+                    </option>
+
+                    <option value="Government">
+                        Government
+                    </option>
+
+                    <option value="Legislation">
+                        Legislation
+                    </option>
+
+                    <option value="Business">
+                        Business
+                    </option>
+
+                    <option value="Elections">
+                        Elections
+                    </option>
+
+                    <option value="People">
+                        People
+                    </option>
+
+                    <option value="Events">
+                        Events
+                    </option>
+
+                    <option value="Organizations">
+                        Organizations
+                    </option>
+
+                    <option value="Other Records">
+                        Other Records
+                    </option>
+
+                </select>
+
+                <label for="record-content">
+                    Record Content
+                </label>
+
+                <textarea
+                    id="record-content"
+                    maxlength="10000"
+                    placeholder="Enter the information for this record"
+                    required
+                ></textarea>
+
+                <button
+                    type="submit"
+                    id="submit-record-button"
+                >
+                    Publish Record
+                </button>
+
+            </form>
+
+            <div
+                id="record-message"
+                hidden
+            ></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section
     id="categories"
     class="section alt"
 >
@@ -443,7 +603,165 @@
 
 <script src="script.js"></script>
 
+<script>
+
+const createRecordButton =
+    document.getElementById(
+        "create-record-button"
+    );
+
+const createRecordSection =
+    document.getElementById(
+        "create-record-section"
+    );
+
+const createRecordForm =
+    document.getElementById(
+        "create-record-form"
+    );
+
+const submitRecordButton =
+    document.getElementById(
+        "submit-record-button"
+    );
+
+const recordMessage =
+    document.getElementById(
+        "record-message"
+    );
+
+async function checkArchivePermission() {
+
+    try {
+
+        const response =
+            await fetch("/api/me");
+
+        const data =
+            await response.json();
+
+        if (
+            data.authenticated &&
+            data.user &&
+            data.user.username === "kaelzvx"
+        ) {
+
+            createRecordButton.style.display =
+                "flex";
+
+            createRecordSection.style.display =
+                "block";
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Unable to check archive permissions:",
+            error
+        );
+
+    }
+
+}
+
+createRecordForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const title =
+            document
+                .getElementById("record-title")
+                .value
+                .trim();
+
+        const category =
+            document
+                .getElementById("record-category")
+                .value;
+
+        const content =
+            document
+                .getElementById("record-content")
+                .value
+                .trim();
+
+        submitRecordButton.disabled =
+            true;
+
+        submitRecordButton.textContent =
+            "Publishing...";
+
+        recordMessage.hidden =
+            false;
+
+        recordMessage.textContent =
+            "Publishing record...";
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/archive-post",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            title,
+                            category,
+                            content
+                        })
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to publish record."
+                );
+
+            }
+
+            recordMessage.textContent =
+                "Record published successfully. Record ID: " +
+                data.record_id;
+
+            createRecordForm.reset();
+
+        } catch (error) {
+
+            recordMessage.textContent =
+                error.message ||
+                "Unable to publish record.";
+
+        } finally {
+
+            submitRecordButton.disabled =
+                false;
+
+            submitRecordButton.textContent =
+                "Publish Record";
+
+        }
+
+    }
+);
+
+checkArchivePermission();
+
+</script>
+
 </body>
 
 </html>
-```
