@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -25,7 +24,12 @@
 
     <link
         rel="stylesheet"
-        href="styles.css"
+        href="/styles.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/editor.css?v=2"
     >
 
     <style>
@@ -39,7 +43,6 @@
         }
 
         #create-record-section input,
-        #create-record-section textarea,
         #create-record-section select {
             width: 100%;
             box-sizing: border-box;
@@ -52,8 +55,8 @@
         }
 
         #create-record-section textarea {
-            min-height: 160px;
-            resize: vertical;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         #record-message {
@@ -64,7 +67,9 @@
 
 </head>
 
+
 <body>
+
 
 <header>
 
@@ -86,6 +91,7 @@
             </span>
 
         </a>
+
 
         <nav>
 
@@ -123,7 +129,9 @@
 
 </header>
 
+
 <main>
+
 
 <section class="hero">
 
@@ -142,6 +150,7 @@
             organizations, legislation, businesses, and other records.
         </p>
 
+
         <div class="search">
 
             <input
@@ -151,12 +160,14 @@
             >
 
             <button
+                type="button"
                 onclick="searchRecords()"
             >
                 Search
             </button>
 
         </div>
+
 
         <div
             id="create-record-button"
@@ -168,6 +179,7 @@
             </a>
 
         </div>
+
 
         <div class="quick">
 
@@ -192,6 +204,8 @@
     </div>
 
 </section>
+
+
 
 <section
     id="records"
@@ -219,6 +233,7 @@
             </span>
 
         </div>
+
 
         <div
             id="grid"
@@ -249,6 +264,7 @@
 
             </article>
 
+
             <article
                 class="card"
                 data-search="legislation laws bills acts legal"
@@ -272,6 +288,7 @@
                 </a>
 
             </article>
+
 
             <article
                 class="card"
@@ -297,6 +314,7 @@
 
             </article>
 
+
             <article
                 class="card"
                 data-search="elections candidates voting campaigns"
@@ -321,6 +339,7 @@
 
             </article>
 
+
             <article
                 class="card"
                 data-search="people biography officials notable figures"
@@ -344,6 +363,7 @@
                 </a>
 
             </article>
+
 
             <article
                 class="card"
@@ -371,6 +391,7 @@
 
         </div>
 
+
         <div
             id="none"
             hidden
@@ -382,6 +403,8 @@
     </div>
 
 </section>
+
+
 
 <section
     id="create-record-section"
@@ -405,7 +428,9 @@
                 Redmont Archives archive administrator.
             </p>
 
+
             <form id="create-record-form">
+
 
                 <label for="record-title">
                     Record Title
@@ -418,6 +443,7 @@
                     placeholder="Enter record title"
                     required
                 >
+
 
                 <label for="record-category">
                     Category
@@ -466,16 +492,238 @@
 
                 </select>
 
-                <label for="record-content">
+
+                <label>
                     Record Content
                 </label>
 
-                <textarea
+
+                <!--
+                    The editor stores its HTML in this hidden input.
+                -->
+
+                <input
+                    type="hidden"
                     id="record-content"
-                    maxlength="10000"
-                    placeholder="Enter the information for this record"
-                    required
-                ></textarea>
+                    name="record-content"
+                >
+
+
+                <div
+                    class="redmont-editor"
+                    data-input="record-content"
+                >
+
+
+                    <div class="redmont-editor-toolbar">
+
+
+                        <button
+                            type="button"
+                            data-command="bold"
+                            title="Bold"
+                        >
+                            <strong>B</strong>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="italic"
+                            title="Italic"
+                        >
+                            <em>I</em>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="underline"
+                            title="Underline"
+                        >
+                            <u>U</u>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="strikeThrough"
+                            title="Strikethrough"
+                        >
+                            <s>S</s>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyLeft"
+                            title="Align left"
+                        >
+                            Left
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyCenter"
+                            title="Center"
+                        >
+                            Center
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyRight"
+                            title="Align right"
+                        >
+                            Right
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="insertUnorderedList"
+                            title="Bullet list"
+                        >
+                            • List
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="insertOrderedList"
+                            title="Numbered list"
+                        >
+                            1. List
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h1"
+                            title="Heading 1"
+                        >
+                            H1
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h2"
+                            title="Heading 2"
+                        >
+                            H2
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h3"
+                            title="Heading 3"
+                        >
+                            H3
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="p"
+                            title="Paragraph"
+                        >
+                            P
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="fontSize"
+                            title="Font size"
+                        >
+                            Size
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="fontColor"
+                            title="Font color"
+                        >
+                            Color
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="link"
+                            title="Insert link"
+                        >
+                            Link
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="image"
+                            title="Insert image"
+                        >
+                            Image
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="table"
+                            title="Insert table"
+                        >
+                            Table
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="checklist"
+                            title="Insert checklist"
+                        >
+                            ☑ Checklist
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="footer"
+                            title="Insert footer"
+                        >
+                            Footer
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="clearFormatting"
+                            title="Clear formatting"
+                        >
+                            Clear
+                        </button>
+
+
+                    </div>
+
+
+                    <div
+                        class="redmont-editor-surface"
+                        contenteditable="true"
+                        spellcheck="true"
+                        aria-label="Record content editor"
+                    ></div>
+
+
+                </div>
+
 
                 <button
                     type="submit"
@@ -484,18 +732,23 @@
                     Publish Record
                 </button>
 
+
             </form>
+
 
             <div
                 id="record-message"
                 hidden
             ></div>
 
+
         </div>
 
     </div>
 
 </section>
+
+
 
 <section
     id="categories"
@@ -512,45 +765,25 @@
             Archive categories
         </h2>
 
+
         <div class="categories">
 
-            <span>
-                Government
-            </span>
-
-            <span>
-                Legislation
-            </span>
-
-            <span>
-                Business
-            </span>
-
-            <span>
-                Elections
-            </span>
-
-            <span>
-                People
-            </span>
-
-            <span>
-                Events
-            </span>
-
-            <span>
-                Organizations
-            </span>
-
-            <span>
-                Other Records
-            </span>
+            <span>Government</span>
+            <span>Legislation</span>
+            <span>Business</span>
+            <span>Elections</span>
+            <span>People</span>
+            <span>Events</span>
+            <span>Organizations</span>
+            <span>Other Records</span>
 
         </div>
 
     </div>
 
 </section>
+
+
 
 <section
     id="about"
@@ -571,6 +804,7 @@
 
         </div>
 
+
         <p>
             Redmont Archives is designed to make historical
             and public information easier to find, organize,
@@ -583,7 +817,10 @@
 
 </section>
 
+
 </main>
+
+
 
 <footer>
 
@@ -601,7 +838,12 @@
 
 </footer>
 
-<script src="script.js"></script>
+
+
+<script src="/script.js"></script>
+
+<script src="/editor.js?v=2"></script>
+
 
 <script>
 
@@ -610,35 +852,44 @@ const createRecordButton =
         "create-record-button"
     );
 
+
 const createRecordSection =
     document.getElementById(
         "create-record-section"
     );
+
 
 const createRecordForm =
     document.getElementById(
         "create-record-form"
     );
 
+
 const submitRecordButton =
     document.getElementById(
         "submit-record-button"
     );
+
 
 const recordMessage =
     document.getElementById(
         "record-message"
     );
 
+
 async function checkArchivePermission() {
 
     try {
 
         const response =
-            await fetch("/api/me");
+            await fetch(
+                "/api/me"
+            );
+
 
         const data =
             await response.json();
+
 
         if (
             data.authenticated &&
@@ -648,6 +899,7 @@ async function checkArchivePermission() {
 
             createRecordButton.style.display =
                 "flex";
+
 
             createRecordSection.style.display =
                 "block";
@@ -665,40 +917,73 @@ async function checkArchivePermission() {
 
 }
 
+
 createRecordForm.addEventListener(
     "submit",
     async function(event) {
 
         event.preventDefault();
 
+
         const title =
             document
-                .getElementById("record-title")
+                .getElementById(
+                    "record-title"
+                )
                 .value
                 .trim();
+
 
         const category =
             document
-                .getElementById("record-category")
+                .getElementById(
+                    "record-category"
+                )
                 .value;
+
+
+        /*
+            editor.js keeps this hidden field
+            synchronized with the visual editor.
+        */
 
         const content =
             document
-                .getElementById("record-content")
+                .getElementById(
+                    "record-content"
+                )
                 .value
                 .trim();
+
+
+        if (!content) {
+
+            recordMessage.hidden =
+                false;
+
+            recordMessage.textContent =
+                "Please enter record content.";
+
+            return;
+
+        }
+
 
         submitRecordButton.disabled =
             true;
 
+
         submitRecordButton.textContent =
             "Publishing...";
+
 
         recordMessage.hidden =
             false;
 
+
         recordMessage.textContent =
             "Publishing record...";
+
 
         try {
 
@@ -718,11 +1003,14 @@ createRecordForm.addEventListener(
                             category,
                             content
                         })
+
                     }
                 );
 
+
             const data =
                 await response.json();
+
 
             if (!response.ok) {
 
@@ -733,11 +1021,32 @@ createRecordForm.addEventListener(
 
             }
 
+
             recordMessage.textContent =
                 "Record published successfully. Record ID: " +
                 data.record_id;
 
+
             createRecordForm.reset();
+
+
+            const editor =
+                document.querySelector(
+                    ".redmont-editor-surface"
+                );
+
+
+            if (editor) {
+                editor.innerHTML = "";
+            }
+
+
+            document
+                .getElementById(
+                    "record-content"
+                )
+                .value = "";
+
 
         } catch (error) {
 
@@ -750,6 +1059,7 @@ createRecordForm.addEventListener(
             submitRecordButton.disabled =
                 false;
 
+
             submitRecordButton.textContent =
                 "Publish Record";
 
@@ -758,9 +1068,11 @@ createRecordForm.addEventListener(
     }
 );
 
+
 checkArchivePermission();
 
 </script>
+
 
 </body>
 
