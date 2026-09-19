@@ -1,7 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -27,12 +29,19 @@
         href="/styles.css"
     >
 
+    <!-- Rich text editor styling -->
     <link
         rel="stylesheet"
         href="/editor.css?v=2"
     >
 
     <style>
+
+        /*
+         * Archive creation area.
+         * It remains hidden until the authorized
+         * archive account is detected.
+         */
 
         #create-record-section {
             display: none;
@@ -41,6 +50,7 @@
         #create-record-button {
             display: none;
         }
+
 
         #create-record-section input,
         #create-record-section select {
@@ -54,12 +64,27 @@
             color: var(--text);
         }
 
-        #create-record-section textarea {
-            width: 100%;
-            box-sizing: border-box;
-        }
 
         #record-message {
+            margin-top: 15px;
+        }
+
+
+        /*
+         * Make the editor work properly inside
+         * the archive creation card.
+         */
+
+        #create-record-section .redmont-editor {
+            margin-top: 8px;
+        }
+
+
+        /*
+         * Dynamic ?create editor.
+         */
+
+        #ai-result .redmont-editor {
             margin-top: 15px;
         }
 
@@ -119,7 +144,7 @@
                 Log In
             </a>
 
-            <a href="/signup.html">
+            <a href="/register">
                 Create Account
             </a>
 
@@ -128,6 +153,7 @@
     </div>
 
 </header>
+
 
 
 <main>
@@ -141,9 +167,11 @@
             PUBLIC RECORDS • RESEARCH • HISTORY
         </div>
 
+
         <h1>
             The Redmont Archives
         </h1>
+
 
         <p>
             A centralized public archive for documenting events,
@@ -155,9 +183,12 @@
 
             <input
                 id="q"
+                type="text"
                 placeholder="Search the archives..."
                 aria-label="Search the archives"
+                autocomplete="off"
             >
+
 
             <button
                 type="button"
@@ -168,6 +199,10 @@
 
         </div>
 
+
+        <!--
+            Visible only to the authorized archive administrator.
+        -->
 
         <div
             id="create-record-button"
@@ -187,13 +222,16 @@
                 Browse records
             </a>
 
+
             <a href="/organizations.html">
                 Browse organizations
             </a>
 
+
             <a href="#categories">
                 Browse categories
             </a>
+
 
             <a href="/create-organization.html">
                 Create Organization
@@ -214,6 +252,7 @@
 
     <div class="container">
 
+
         <div class="heading">
 
             <div>
@@ -222,11 +261,13 @@
                     ARCHIVE INDEX
                 </div>
 
+
                 <h2>
                     Featured records
                 </h2>
 
             </div>
+
 
             <span id="count">
                 6 collections
@@ -235,10 +276,12 @@
         </div>
 
 
+
         <div
             id="grid"
             class="grid"
         >
+
 
             <article
                 class="card"
@@ -249,20 +292,24 @@
                     Government
                 </b>
 
+
                 <h3>
                     Government Records
                 </h3>
+
 
                 <p>
                     Administrative history, offices, officials,
                     and major government actions.
                 </p>
 
+
                 <a href="/archive/government">
                     View collection →
                 </a>
 
             </article>
+
 
 
             <article
@@ -274,20 +321,24 @@
                     Legislation
                 </b>
 
+
                 <h3>
-                    Laws & Legislation
+                    Laws &amp; Legislation
                 </h3>
+
 
                 <p>
                     Important laws, bills, amendments,
                     and votes.
                 </p>
 
+
                 <a href="/archive/legislation">
                     View collection →
                 </a>
 
             </article>
+
 
 
             <article
@@ -299,20 +350,24 @@
                     Business
                 </b>
 
+
                 <h3>
-                    Businesses & Organizations
+                    Businesses &amp; Organizations
                 </h3>
+
 
                 <p>
                     Companies, organizations, founders,
                     and significant changes.
                 </p>
 
+
                 <a href="/archive/business">
                     View collection →
                 </a>
 
             </article>
+
 
 
             <article
@@ -324,20 +379,24 @@
                     Elections
                 </b>
 
+
                 <h3>
                     Elections
                 </h3>
+
 
                 <p>
                     Election results, candidates,
                     campaigns, and historical records.
                 </p>
 
+
                 <a href="/archive/elections">
                     View collection →
                 </a>
 
             </article>
+
 
 
             <article
@@ -349,20 +408,24 @@
                     People
                 </b>
 
+
                 <h3>
-                    People & Officials
+                    People &amp; Officials
                 </h3>
+
 
                 <p>
                     Biographical and service records
                     for notable people and officials.
                 </p>
 
+
                 <a href="/archive/people">
                     View collection →
                 </a>
 
             </article>
+
 
 
             <article
@@ -374,14 +437,17 @@
                     Events
                 </b>
 
+
                 <h3>
-                    Events & History
+                    Events &amp; History
                 </h3>
+
 
                 <p>
                     A chronological record of notable
                     events and developments.
                 </p>
+
 
                 <a href="/archive/events">
                     View collection →
@@ -389,7 +455,9 @@
 
             </article>
 
+
         </div>
+
 
 
         <div
@@ -397,7 +465,9 @@
             hidden
             class="none"
         >
+
             No records matched your search.
+
         </div>
 
     </div>
@@ -406,6 +476,10 @@
 
 
 
+<!-- =========================================================
+     AUTHORIZED MAIN ARCHIVE CREATION
+     ========================================================= -->
+
 <section
     id="create-record-section"
     class="section"
@@ -413,20 +487,25 @@
 
     <div class="container">
 
+
         <div class="card">
+
 
             <div class="eyebrow">
                 ARCHIVE MANAGEMENT
             </div>
 
+
             <h2>
                 Create Archive Record
             </h2>
+
 
             <p>
                 This form is available only to the authorized
                 Redmont Archives archive administrator.
             </p>
+
 
 
             <form id="create-record-form">
@@ -436,8 +515,10 @@
                     Record Title
                 </label>
 
+
                 <input
                     id="record-title"
+                    name="title"
                     type="text"
                     maxlength="200"
                     placeholder="Enter record title"
@@ -445,12 +526,15 @@
                 >
 
 
+
                 <label for="record-category">
                     Category
                 </label>
 
+
                 <select
                     id="record-category"
+                    name="category"
                     required
                 >
 
@@ -458,33 +542,41 @@
                         Select a category
                     </option>
 
+
                     <option value="Government">
                         Government
                     </option>
+
 
                     <option value="Legislation">
                         Legislation
                     </option>
 
+
                     <option value="Business">
                         Business
                     </option>
+
 
                     <option value="Elections">
                         Elections
                     </option>
 
+
                     <option value="People">
                         People
                     </option>
+
 
                     <option value="Events">
                         Events
                     </option>
 
+
                     <option value="Organizations">
                         Organizations
                     </option>
+
 
                     <option value="Other Records">
                         Other Records
@@ -493,20 +585,23 @@
                 </select>
 
 
+
                 <label>
                     Record Content
                 </label>
 
 
                 <!--
-                    The editor stores its HTML in this hidden input.
+                    editor.js copies the formatted HTML
+                    into this hidden field.
                 -->
 
                 <input
                     type="hidden"
                     id="record-content"
-                    name="record-content"
+                    name="content"
                 >
+
 
 
                 <div
@@ -566,7 +661,7 @@
                         <button
                             type="button"
                             data-command="justifyCenter"
-                            title="Center"
+                            title="Align center"
                         >
                             Center
                         </button>
@@ -584,7 +679,7 @@
                         <button
                             type="button"
                             data-command="insertUnorderedList"
-                            title="Bullet list"
+                            title="Bulleted list"
                         >
                             • List
                         </button>
@@ -714,6 +809,7 @@
                     </div>
 
 
+
                     <div
                         class="redmont-editor-surface"
                         contenteditable="true"
@@ -725,6 +821,7 @@
                 </div>
 
 
+
                 <button
                     type="submit"
                     id="submit-record-button"
@@ -734,6 +831,7 @@
 
 
             </form>
+
 
 
             <div
@@ -757,25 +855,60 @@
 
     <div class="container">
 
+
         <div class="eyebrow">
             CLASSIFICATION
         </div>
+
 
         <h2>
             Archive categories
         </h2>
 
 
+
         <div class="categories">
 
-            <span>Government</span>
-            <span>Legislation</span>
-            <span>Business</span>
-            <span>Elections</span>
-            <span>People</span>
-            <span>Events</span>
-            <span>Organizations</span>
-            <span>Other Records</span>
+
+            <span>
+                Government
+            </span>
+
+
+            <span>
+                Legislation
+            </span>
+
+
+            <span>
+                Business
+            </span>
+
+
+            <span>
+                Elections
+            </span>
+
+
+            <span>
+                People
+            </span>
+
+
+            <span>
+                Events
+            </span>
+
+
+            <span>
+                Organizations
+            </span>
+
+
+            <span>
+                Other Records
+            </span>
+
 
         </div>
 
@@ -792,11 +925,13 @@
 
     <div class="container about">
 
+
         <div>
 
             <div class="eyebrow">
                 ABOUT THE ARCHIVE
             </div>
+
 
             <h2>
                 A public record, built carefully.
@@ -813,6 +948,7 @@
             a broader archive of records.
         </p>
 
+
     </div>
 
 </section>
@@ -826,13 +962,16 @@
 
     <div class="container foot">
 
+
         <span>
             © 2026 Redmont Archives
         </span>
 
+
         <span>
             Public information archive
         </span>
+
 
     </div>
 
@@ -840,12 +979,21 @@
 
 
 
-<script src="/script.js"></script>
+<!-- Existing archive search functionality -->
+<script src="/script.js?v=2"></script>
 
+
+<!-- Rich text editor functionality -->
 <script src="/editor.js?v=2"></script>
 
 
+
 <script>
+
+/* =========================================================
+   MAIN ARCHIVE CREATION
+   ========================================================= */
+
 
 const createRecordButton =
     document.getElementById(
@@ -877,13 +1025,17 @@ const recordMessage =
     );
 
 
+
 async function checkArchivePermission() {
 
     try {
 
         const response =
             await fetch(
-                "/api/me"
+                "/api/me",
+                {
+                    credentials: "same-origin"
+                }
             );
 
 
@@ -906,6 +1058,7 @@ async function checkArchivePermission() {
 
         }
 
+
     } catch (error) {
 
         console.error(
@@ -918,11 +1071,18 @@ async function checkArchivePermission() {
 }
 
 
+
 createRecordForm.addEventListener(
     "submit",
     async function(event) {
 
         event.preventDefault();
+
+
+        /*
+         * editor.js synchronizes the editor
+         * into #record-content before submit.
+         */
 
 
         const title =
@@ -939,13 +1099,9 @@ createRecordForm.addEventListener(
                 .getElementById(
                     "record-category"
                 )
-                .value;
+                .value
+                .trim();
 
-
-        /*
-            editor.js keeps this hidden field
-            synchronized with the visual editor.
-        */
 
         const content =
             document
@@ -954,6 +1110,32 @@ createRecordForm.addEventListener(
                 )
                 .value
                 .trim();
+
+
+        if (!title) {
+
+            recordMessage.hidden =
+                false;
+
+            recordMessage.textContent =
+                "Please enter a record title.";
+
+            return;
+
+        }
+
+
+        if (!category) {
+
+            recordMessage.hidden =
+                false;
+
+            recordMessage.textContent =
+                "Please select a category.";
+
+            return;
+
+        }
 
 
         if (!content) {
@@ -993,15 +1175,24 @@ createRecordForm.addEventListener(
                     {
                         method: "POST",
 
+                        credentials: "same-origin",
+
                         headers: {
                             "Content-Type":
                                 "application/json"
                         },
 
                         body: JSON.stringify({
-                            title,
-                            category,
-                            content
+
+                            title:
+                                title,
+
+                            category:
+                                category,
+
+                            content:
+                                content
+
                         })
 
                     }
@@ -1030,14 +1221,17 @@ createRecordForm.addEventListener(
             createRecordForm.reset();
 
 
-            const editor =
-                document.querySelector(
+            const editorSurface =
+                createRecordForm.querySelector(
                     ".redmont-editor-surface"
                 );
 
 
-            if (editor) {
-                editor.innerHTML = "";
+            if (editorSurface) {
+
+                editorSurface.innerHTML =
+                    "";
+
             }
 
 
@@ -1045,10 +1239,17 @@ createRecordForm.addEventListener(
                 .getElementById(
                     "record-content"
                 )
-                .value = "";
+                .value =
+                "";
 
 
         } catch (error) {
+
+            console.error(
+                "Archive creation error:",
+                error
+            );
+
 
             recordMessage.textContent =
                 error.message ||
@@ -1069,6 +1270,656 @@ createRecordForm.addEventListener(
 );
 
 
+
+/* =========================================================
+   ?create COMMAND
+   =========================================================
+
+   The existing script.js supports:
+
+       ?create Title Category
+
+   It previously produced a plain textarea.
+
+   We replace that UI here with the same Redmont
+   rich-text editor so BOTH archive creation paths
+   use the editor.
+   ========================================================= */
+
+
+function createEditorToolbarHTML() {
+
+    return `
+
+        <div class="redmont-editor-toolbar">
+
+            <button
+                type="button"
+                data-command="bold"
+                title="Bold"
+            >
+                <strong>B</strong>
+            </button>
+
+            <button
+                type="button"
+                data-command="italic"
+                title="Italic"
+            >
+                <em>I</em>
+            </button>
+
+            <button
+                type="button"
+                data-command="underline"
+                title="Underline"
+            >
+                <u>U</u>
+            </button>
+
+            <button
+                type="button"
+                data-command="strikeThrough"
+                title="Strikethrough"
+            >
+                <s>S</s>
+            </button>
+
+            <button
+                type="button"
+                data-command="justifyLeft"
+                title="Align left"
+            >
+                Left
+            </button>
+
+            <button
+                type="button"
+                data-command="justifyCenter"
+                title="Align center"
+            >
+                Center
+            </button>
+
+            <button
+                type="button"
+                data-command="justifyRight"
+                title="Align right"
+            >
+                Right
+            </button>
+
+            <button
+                type="button"
+                data-command="insertUnorderedList"
+                title="Bulleted list"
+            >
+                • List
+            </button>
+
+            <button
+                type="button"
+                data-command="insertOrderedList"
+                title="Numbered list"
+            >
+                1. List
+            </button>
+
+            <button
+                type="button"
+                data-command="formatBlock"
+                data-value="h1"
+                title="Heading 1"
+            >
+                H1
+            </button>
+
+            <button
+                type="button"
+                data-command="formatBlock"
+                data-value="h2"
+                title="Heading 2"
+            >
+                H2
+            </button>
+
+            <button
+                type="button"
+                data-command="formatBlock"
+                data-value="h3"
+                title="Heading 3"
+            >
+                H3
+            </button>
+
+            <button
+                type="button"
+                data-command="formatBlock"
+                data-value="p"
+                title="Paragraph"
+            >
+                P
+            </button>
+
+            <button
+                type="button"
+                data-action="fontSize"
+                title="Font size"
+            >
+                Size
+            </button>
+
+            <button
+                type="button"
+                data-action="fontColor"
+                title="Font color"
+            >
+                Color
+            </button>
+
+            <button
+                type="button"
+                data-action="link"
+                title="Insert link"
+            >
+                Link
+            </button>
+
+            <button
+                type="button"
+                data-action="image"
+                title="Insert image"
+            >
+                Image
+            </button>
+
+            <button
+                type="button"
+                data-action="table"
+                title="Insert table"
+            >
+                Table
+            </button>
+
+            <button
+                type="button"
+                data-action="checklist"
+                title="Insert checklist"
+            >
+                ☑ Checklist
+            </button>
+
+            <button
+                type="button"
+                data-action="footer"
+                title="Insert footer"
+            >
+                Footer
+            </button>
+
+            <button
+                type="button"
+                data-action="clearFormatting"
+                title="Clear formatting"
+            >
+                Clear
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+
+window.showCreateRecord =
+    function(title, category) {
+
+        let result =
+            document.getElementById(
+                "ai-result"
+            );
+
+
+        /*
+         * Create the result container if it
+         * does not already exist.
+         */
+
+        if (!result) {
+
+            result =
+                document.createElement(
+                    "div"
+                );
+
+
+            result.id =
+                "ai-result";
+
+
+            result.className =
+                "ai-result";
+
+
+            const searchBox =
+                document.querySelector(
+                    ".search"
+                );
+
+
+            searchBox.parentNode.insertBefore(
+                result,
+                searchBox.nextElementSibling
+            );
+
+        }
+
+
+        result.innerHTML =
+            "";
+
+
+        const label =
+            document.createElement(
+                "div"
+            );
+
+
+        label.className =
+            "ai-result-label";
+
+
+        label.textContent =
+            "CREATE ARCHIVE RECORD";
+
+
+        const heading =
+            document.createElement(
+                "h2"
+            );
+
+
+        heading.textContent =
+            title;
+
+
+        const categoryText =
+            document.createElement(
+                "p"
+            );
+
+
+        categoryText.textContent =
+            "Category: " + category;
+
+
+
+        /*
+         * Unique field ID for this dynamic editor.
+         */
+
+        const inputId =
+            "dynamic-record-content";
+
+
+        const hiddenInput =
+            document.createElement(
+                "input"
+            );
+
+
+        hiddenInput.type =
+            "hidden";
+
+
+        hiddenInput.id =
+            inputId;
+
+
+        hiddenInput.value =
+            "";
+
+
+        const editor =
+            document.createElement(
+                "div"
+            );
+
+
+        editor.className =
+            "redmont-editor";
+
+
+        editor.dataset.input =
+            inputId;
+
+
+        editor.innerHTML =
+
+            createEditorToolbarHTML() +
+
+            `
+
+                <div
+                    class="redmont-editor-surface"
+                    contenteditable="true"
+                    spellcheck="true"
+                    aria-label="Archive record content editor"
+                ></div>
+
+            `;
+
+
+
+        const buttons =
+            document.createElement(
+                "div"
+            );
+
+
+        buttons.style.marginTop =
+            "15px";
+
+
+        const createButton =
+            document.createElement(
+                "button"
+            );
+
+
+        createButton.type =
+            "button";
+
+
+        createButton.textContent =
+            "Publish Record";
+
+
+        const cancelButton =
+            document.createElement(
+                "button"
+            );
+
+
+        cancelButton.type =
+            "button";
+
+
+        cancelButton.textContent =
+            "Cancel";
+
+
+        cancelButton.style.marginLeft =
+            "10px";
+
+
+
+        createButton.addEventListener(
+            "click",
+            async function() {
+
+                /*
+                 * Synchronize manually as a safeguard.
+                 */
+
+                const surface =
+                    editor.querySelector(
+                        ".redmont-editor-surface"
+                    );
+
+
+                const content =
+                    surface.innerHTML.trim();
+
+
+                if (!content) {
+
+                    alert(
+                        "Please enter some record content."
+                    );
+
+                    return;
+
+                }
+
+
+                createButton.disabled =
+                    true;
+
+
+                createButton.textContent =
+                    "Publishing...";
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            "/api/archive-post",
+                            {
+                                method:
+                                    "POST",
+
+                                credentials:
+                                    "same-origin",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        title:
+                                            title,
+
+                                        category:
+                                            category,
+
+                                        content:
+                                            content
+
+                                    })
+
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.error ||
+                            "Unable to publish record."
+                        );
+
+                    }
+
+
+                    result.innerHTML = `
+
+                        <div class="ai-result-label">
+                            RECORD CREATED
+                        </div>
+
+                        <h2>
+                            ${escapeHTML(title)}
+                        </h2>
+
+                        <p>
+                            Record published successfully.
+                            Record ID: ${escapeHTML(
+                                data.record_id
+                            )}
+                        </p>
+
+                    `;
+
+                } catch (error) {
+
+                    console.error(
+                        "Dynamic record creation error:",
+                        error
+                    );
+
+
+                    alert(
+                        error.message ||
+                        "Unable to publish record."
+                    );
+
+                    createButton.disabled =
+                        false;
+
+
+                    createButton.textContent =
+                        "Publish Record";
+
+                }
+
+            }
+        );
+
+
+        cancelButton.addEventListener(
+            "click",
+            function() {
+
+                result.hidden =
+                    true;
+
+            }
+        );
+
+
+        buttons.appendChild(
+            createButton
+        );
+
+
+        buttons.appendChild(
+            cancelButton
+        );
+
+
+
+        result.appendChild(
+            label
+        );
+
+
+        result.appendChild(
+            heading
+        );
+
+
+        result.appendChild(
+            categoryText
+        );
+
+
+        result.appendChild(
+            hiddenInput
+        );
+
+
+        result.appendChild(
+            editor
+        );
+
+
+        result.appendChild(
+            buttons
+        );
+
+
+        result.hidden =
+            false;
+
+
+
+        /*
+         * editor.js exposes initEditor globally.
+         * Initialize the newly-created editor immediately.
+         */
+
+        if (
+            typeof initEditor ===
+            "function"
+        ) {
+
+            initEditor(
+                editor
+            );
+
+        }
+
+
+        const surface =
+            editor.querySelector(
+                ".redmont-editor-surface"
+            );
+
+
+        if (surface) {
+
+            surface.focus();
+
+        }
+
+    };
+
+
+
+/* =========================================================
+   SECURITY-SAFE DISPLAY HELPER
+   ========================================================= */
+
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+
 checkArchivePermission();
 
 </script>
@@ -1077,3 +1928,4 @@ checkArchivePermission();
 </body>
 
 </html>
+```
