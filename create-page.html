@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,28 +9,33 @@
     <title>Create Organization Page | Redmont Archives</title>
 
     <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/editor.css">
 </head>
 
 <body>
 
 <header>
-
     <div class="container nav">
 
         <a class="brand" href="/">
-            <span class="mark">RA</span>
+            <img
+                src="/logo.svg"
+                alt="Redmont Archives logo"
+                class="logo"
+            >
             <span>Redmont Archives</span>
         </a>
 
         <nav>
             <a href="/">Archive</a>
+            <a href="/organizations.html">Organizations</a>
             <a href="/#categories">Categories</a>
             <a href="/#about">About</a>
         </nav>
 
     </div>
-
 </header>
+
 
 <main>
 
@@ -53,6 +59,7 @@
 
     </section>
 
+
     <section class="section">
 
         <div class="container">
@@ -66,6 +73,7 @@
                 <h2>
                     New Organization Page
                 </h2>
+
 
                 <form id="page-form">
 
@@ -83,7 +91,9 @@
                         </option>
                     </select>
 
+
                     <br><br>
+
 
                     <label for="title">
                         Page Title
@@ -97,7 +107,9 @@
                         required
                     >
 
+
                     <br><br>
+
 
                     <label for="slug">
                         Page Slug
@@ -111,21 +123,226 @@
                         required
                     >
 
+
                     <br><br>
 
-                    <label for="content">
+
+                    <label>
                         Page Content
                     </label>
 
-                    <textarea
+
+                    <!--
+                        The hidden input stores the HTML generated
+                        by the editor and is submitted to the API.
+                    -->
+
+                    <input
+                        type="hidden"
                         id="content"
                         name="content"
-                        rows="10"
-                        placeholder="Enter the information you want to publish..."
-                        required
-                    ></textarea>
+                    >
 
-                    <br><br>
+
+                    <div
+                        class="redmont-editor"
+                        data-input="content"
+                    >
+
+                        <div class="redmont-editor-toolbar">
+
+                            <button
+                                type="button"
+                                data-command="bold"
+                                title="Bold"
+                            >
+                                <strong>B</strong>
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="italic"
+                                title="Italic"
+                            >
+                                <em>I</em>
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="underline"
+                                title="Underline"
+                            >
+                                <u>U</u>
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="strikeThrough"
+                                title="Strikethrough"
+                            >
+                                <s>S</s>
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-command="justifyLeft"
+                                title="Align left"
+                            >
+                                Left
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="justifyCenter"
+                                title="Center"
+                            >
+                                Center
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="justifyRight"
+                                title="Align right"
+                            >
+                                Right
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-command="insertUnorderedList"
+                                title="Bullet list"
+                            >
+                                • List
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="insertOrderedList"
+                                title="Numbered list"
+                            >
+                                1. List
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-command="formatBlock"
+                                data-value="h1"
+                                title="Heading 1"
+                            >
+                                H1
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="formatBlock"
+                                data-value="h2"
+                                title="Heading 2"
+                            >
+                                H2
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="formatBlock"
+                                data-value="h3"
+                                title="Heading 3"
+                            >
+                                H3
+                            </button>
+
+                            <button
+                                type="button"
+                                data-command="formatBlock"
+                                data-value="p"
+                                title="Paragraph"
+                            >
+                                P
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-action="fontSize"
+                                title="Font size"
+                            >
+                                Size
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="fontColor"
+                                title="Font color"
+                            >
+                                Color
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-action="link"
+                                title="Insert link"
+                            >
+                                Link
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="image"
+                                title="Insert image"
+                            >
+                                Image
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="table"
+                                title="Insert table"
+                            >
+                                Table
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="checklist"
+                                title="Insert checklist"
+                            >
+                                ☑ Checklist
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="footer"
+                                title="Insert footer"
+                            >
+                                Footer
+                            </button>
+
+                            <button
+                                type="button"
+                                data-action="clearFormatting"
+                                title="Clear formatting"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="redmont-editor-surface"
+                            contenteditable="true"
+                            spellcheck="true"
+                            aria-label="Page content editor"
+                        ></div>
+
+                    </div>
+
+
+                    <br>
+
 
                     <label for="status">
                         Page Status
@@ -136,6 +353,7 @@
                         name="status"
                         required
                     >
+
                         <option value="draft">
                             Draft
                         </option>
@@ -146,15 +364,24 @@
 
                     </select>
 
+
                     <br><br>
 
-                    <button type="submit" id="create-button">
+
+                    <button
+                        type="submit"
+                        id="create-button"
+                    >
                         Create Page
                     </button>
 
                 </form>
 
-                <div id="result" hidden></div>
+
+                <div
+                    id="result"
+                    hidden
+                ></div>
 
             </div>
 
@@ -163,6 +390,7 @@
     </section>
 
 </main>
+
 
 <footer>
 
@@ -180,28 +408,48 @@
 
 </footer>
 
+
+<script src="/editor.js"></script>
+
+
 <script>
 
-const form = document.getElementById("page-form");
-const result = document.getElementById("result");
-const button = document.getElementById("create-button");
-const organizationSelect = document.getElementById("organization-id");
+const form =
+    document.getElementById("page-form");
+
+const result =
+    document.getElementById("result");
+
+const button =
+    document.getElementById("create-button");
+
+const organizationSelect =
+    document.getElementById("organization-id");
+
 
 async function loadOrganizations() {
 
     try {
 
-        const response = await fetch("/api/organizations");
+        const response =
+            await fetch("/api/organizations");
 
         if (!response.ok) {
-            throw new Error("Unable to load organizations.");
+            throw new Error(
+                "Unable to load organizations."
+            );
         }
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
         organizationSelect.innerHTML = "";
 
-        if (!data.organizations || data.organizations.length === 0) {
+
+        if (
+            !data.organizations ||
+            data.organizations.length === 0
+        ) {
 
             organizationSelect.innerHTML = `
                 <option value="">
@@ -212,42 +460,74 @@ async function loadOrganizations() {
             return;
         }
 
-        const placeholder = document.createElement("option");
+
+        const placeholder =
+            document.createElement("option");
 
         placeholder.value = "";
-        placeholder.textContent = "Select an organization...";
+
+        placeholder.textContent =
+            "Select an organization...";
+
         placeholder.disabled = true;
+
         placeholder.selected = true;
 
-        organizationSelect.appendChild(placeholder);
+        organizationSelect.appendChild(
+            placeholder
+        );
 
-        data.organizations.forEach(organization => {
 
-            const option = document.createElement("option");
+        data.organizations.forEach(
+            organization => {
 
-            option.value = organization.id;
-            option.textContent = organization.name;
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
-            organizationSelect.appendChild(option);
+                option.value =
+                    organization.id;
 
-        });
+                option.textContent =
+                    organization.name;
 
-        const params = new URLSearchParams(window.location.search);
-        const requestedSlug = params.get("organization");
+                organizationSelect.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const requestedSlug =
+            params.get("organization");
+
 
         if (requestedSlug) {
 
             const matchingOrganization =
                 data.organizations.find(
                     organization =>
-                        organization.slug === requestedSlug
+                        organization.slug ===
+                        requestedSlug
                 );
 
+
             if (matchingOrganization) {
-                organizationSelect.value = matchingOrganization.id;
+
+                organizationSelect.value =
+                    matchingOrganization.id;
+
             }
 
         }
+
 
     } catch (error) {
 
@@ -263,129 +543,258 @@ async function loadOrganizations() {
 
 }
 
-form.addEventListener("submit", async function (event) {
 
-    event.preventDefault();
+form.addEventListener(
+    "submit",
+    async function(event) {
 
-    const organizationId = organizationSelect.value;
+        event.preventDefault();
 
-    const title =
-        document.getElementById("title").value.trim();
 
-    const slug =
-        document.getElementById("slug").value.trim();
+        const organizationId =
+            organizationSelect.value;
 
-    const content =
-        document.getElementById("content").value.trim();
 
-    const status =
-        document.getElementById("status").value;
+        const title =
+            document
+                .getElementById("title")
+                .value
+                .trim();
 
-    button.disabled = true;
-    button.textContent = "Creating...";
 
-    result.hidden = true;
-    result.innerHTML = "";
+        const slug =
+            document
+                .getElementById("slug")
+                .value
+                .trim();
 
-    try {
 
-        const response = await fetch("/api/create-page", {
+        /*
+         * editor.js automatically keeps the
+         * hidden #content field synchronized
+         * with the editor HTML.
+         */
 
-            method: "POST",
+        const content =
+            document
+                .getElementById("content")
+                .value
+                .trim();
 
-            headers: {
-                "Content-Type": "application/json"
-            },
 
-            body: JSON.stringify({
-                organization_id: organizationId,
-                title,
-                slug,
-                content,
-                status
-            })
+        const status =
+            document
+                .getElementById("status")
+                .value;
 
-        });
 
-        const data = await response.json();
+        if (!content) {
 
-        if (!response.ok) {
+            result.innerHTML = `
+                <br>
+                <div class="eyebrow">
+                    ERROR
+                </div>
+                <p>
+                    Please enter some page content.
+                </p>
+            `;
 
-            throw new Error(
-                data.error || "Unable to create page."
-            );
+            result.hidden = false;
+
+            return;
 
         }
 
-        const statusText =
-            data.page.status === "published"
-                ? "published to"
-                : "saved as a draft in";
 
-        result.innerHTML = `
-            <br>
+        button.disabled = true;
 
-            <div class="eyebrow">
-                PAGE CREATED
-            </div>
+        button.textContent =
+            "Creating...";
 
-            <h3>
-                ${escapeHTML(data.page.title)}
-            </h3>
 
-            <p>
-                Your page has been ${statusText}
-                the organization archive.
-            </p>
-        `;
+        result.hidden = true;
 
-        result.hidden = false;
+        result.innerHTML = "";
 
-        form.reset();
 
-        await loadOrganizations();
+        try {
 
-    } catch (error) {
+            const response =
+                await fetch(
+                    "/api/create-page",
+                    {
+                        method: "POST",
 
-        console.error(error);
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-        result.innerHTML = `
-            <br>
+                        body: JSON.stringify({
 
-            <div class="eyebrow">
-                ERROR
-            </div>
+                            organization_id:
+                                organizationId,
 
-            <p>
-                ${escapeHTML(error.message)}
-            </p>
-        `;
+                            title,
 
-        result.hidden = false;
+                            slug,
 
-    } finally {
+                            content,
 
-        button.disabled = false;
-        button.textContent = "Create Page";
+                            status
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Unable to create page."
+                );
+
+            }
+
+
+            const statusText =
+                data.page.status ===
+                "published"
+
+                    ? "published to"
+
+                    : "saved as a draft in";
+
+
+            result.innerHTML = `
+
+                <br>
+
+                <div class="eyebrow">
+                    PAGE CREATED
+                </div>
+
+                <h3>
+                    ${escapeHTML(
+                        data.page.title
+                    )}
+                </h3>
+
+                <p>
+                    Your page has been
+                    ${statusText}
+                    the organization archive.
+                </p>
+
+            `;
+
+
+            result.hidden = false;
+
+
+            form.reset();
+
+
+            /*
+             * Reset the editor after creating
+             * the page.
+             */
+
+            const editor =
+                document.querySelector(
+                    ".redmont-editor-surface"
+                );
+
+            if (editor) {
+                editor.innerHTML = "";
+            }
+
+
+            await loadOrganizations();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            result.innerHTML = `
+
+                <br>
+
+                <div class="eyebrow">
+                    ERROR
+                </div>
+
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
+
+            `;
+
+
+            result.hidden = false;
+
+
+        } finally {
+
+            button.disabled = false;
+
+            button.textContent =
+                "Create Page";
+
+        }
 
     }
+);
 
-});
 
 function escapeHTML(value) {
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
+
 
 loadOrganizations();
 
 </script>
 
 </body>
+
 </html>
+```
