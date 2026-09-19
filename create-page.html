@@ -1,390 +1,458 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Create Organization Page | Redmont Archives</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="/styles.css">
-    <link rel="stylesheet" href="/editor.css">
+    <title>
+        Create Organization Page | Redmont Archives
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/styles.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/editor.css?v=2"
+    >
+
 </head>
+
 
 <body>
 
+
 <header>
+
     <div class="container nav">
 
-        <a class="brand" href="/">
-            <span class="mark">RA</span>
-            <span>Redmont Archives</span>
+        <a
+            class="brand"
+            href="/"
+        >
+
+            <span class="mark">
+                RA
+            </span>
+
+            <span>
+                Redmont Archives
+            </span>
+
         </a>
 
+
         <nav>
-            <a href="/">Archive</a>
-            <a href="/#categories">Categories</a>
-            <a href="/#about">About</a>
+
+            <a href="/">
+                Archive
+            </a>
+
+            <a href="/organizations.html">
+                Organizations
+            </a>
+
+            <a href="/login.html">
+                Log In
+            </a>
+
         </nav>
 
     </div>
+
 </header>
+
 
 
 <main>
 
-    <section class="hero">
 
-        <div class="container hero-inner">
+<section class="hero">
 
-            <div class="eyebrow">
-                ORGANIZATION ARCHIVE
-            </div>
+    <div class="container hero-inner">
 
-            <h1>
-                Create a Page
-            </h1>
-
-            <p>
-                Publish or save information as part of an organization's archive.
-            </p>
-
+        <div class="eyebrow">
+            ORGANIZATION ARCHIVE
         </div>
 
-    </section>
+        <h1>
+            Create a Page
+        </h1>
+
+        <p>
+            Publish or save information as part of an organization's archive.
+        </p>
+
+    </div>
+
+</section>
 
 
-    <section class="section">
 
-        <div class="container">
+<section class="section">
 
-            <div class="card">
+    <div class="container">
 
-                <div class="eyebrow">
-                    PAGE INFORMATION
-                </div>
+        <div class="card">
 
-                <h2>
-                    New Organization Page
-                </h2>
+            <div class="eyebrow">
+                PAGE INFORMATION
+            </div>
 
-
-                <form id="page-form">
-
-                    <label for="organization-id">
-                        Organization
-                    </label>
-
-                    <select
-                        id="organization-id"
-                        name="organization-id"
-                        required
-                    >
-                        <option value="">
-                            Loading organizations...
-                        </option>
-                    </select>
+            <h2>
+                New Organization Page
+            </h2>
 
 
-                    <br><br>
+            <form id="page-form">
 
 
-                    <label for="title">
-                        Page Title
-                    </label>
+                <label for="organization-id">
+                    Organization
+                </label>
 
-                    <input
-                        id="title"
-                        name="title"
-                        type="text"
-                        placeholder="About the Organization"
-                        required
-                    >
+                <select
+                    id="organization-id"
+                    name="organization-id"
+                    required
+                >
 
+                    <option value="">
+                        Loading organizations...
+                    </option>
 
-                    <br><br>
-
-
-                    <label for="slug">
-                        Page Slug
-                    </label>
-
-                    <input
-                        id="slug"
-                        name="slug"
-                        type="text"
-                        placeholder="about"
-                        required
-                    >
+                </select>
 
 
-                    <br><br>
+                <br>
+                <br>
 
 
-                    <label>
-                        Page Content
-                    </label>
+                <label for="title">
+                    Page Title
+                </label>
 
-                    <!--
-                        This hidden input contains the HTML
-                        produced by the rich text editor.
-                    -->
-                    <input
-                        type="hidden"
-                        id="content"
-                        name="content"
-                    >
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    placeholder="About the Organization"
+                    required
+                >
 
 
-                    <!-- RICH TEXT EDITOR -->
-
-                    <div
-                        class="redmont-editor"
-                        data-input="content"
-                    >
-
-                        <div class="redmont-editor-toolbar">
-
-                            <button
-                                type="button"
-                                data-command="bold"
-                                title="Bold"
-                            >
-                                <strong>B</strong>
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="italic"
-                                title="Italic"
-                            >
-                                <em>I</em>
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="underline"
-                                title="Underline"
-                            >
-                                <u>U</u>
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="strikeThrough"
-                                title="Strikethrough"
-                            >
-                                <s>S</s>
-                            </button>
+                <br>
+                <br>
 
 
-                            <button
-                                type="button"
-                                data-command="justifyLeft"
-                                title="Align left"
-                            >
-                                Left
-                            </button>
+                <label for="slug">
+                    Page Slug
+                </label>
 
-                            <button
-                                type="button"
-                                data-command="justifyCenter"
-                                title="Center"
-                            >
-                                Center
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="justifyRight"
-                                title="Align right"
-                            >
-                                Right
-                            </button>
+                <input
+                    id="slug"
+                    name="slug"
+                    type="text"
+                    placeholder="about"
+                    required
+                >
 
 
-                            <button
-                                type="button"
-                                data-command="insertUnorderedList"
-                                title="Bullet list"
-                            >
-                                • List
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="insertOrderedList"
-                                title="Numbered list"
-                            >
-                                1. List
-                            </button>
+                <br>
+                <br>
 
 
-                            <button
-                                type="button"
-                                data-command="formatBlock"
-                                data-value="h1"
-                                title="Heading 1"
-                            >
-                                H1
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="formatBlock"
-                                data-value="h2"
-                                title="Heading 2"
-                            >
-                                H2
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="formatBlock"
-                                data-value="h3"
-                                title="Heading 3"
-                            >
-                                H3
-                            </button>
-
-                            <button
-                                type="button"
-                                data-command="formatBlock"
-                                data-value="p"
-                                title="Paragraph"
-                            >
-                                P
-                            </button>
+                <label>
+                    Page Content
+                </label>
 
 
-                            <button
-                                type="button"
-                                data-action="fontSize"
-                                title="Font size"
-                            >
-                                Size
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="fontColor"
-                                title="Font color"
-                            >
-                                Color
-                            </button>
+                <input
+                    type="hidden"
+                    id="content"
+                    name="content"
+                >
 
 
-                            <button
-                                type="button"
-                                data-action="link"
-                                title="Insert link"
-                            >
-                                Link
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="image"
-                                title="Insert image"
-                            >
-                                Image
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="table"
-                                title="Insert table"
-                            >
-                                Table
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="checklist"
-                                title="Insert checklist"
-                            >
-                                ☑ Checklist
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="footer"
-                                title="Insert footer"
-                            >
-                                Footer
-                            </button>
-
-                            <button
-                                type="button"
-                                data-action="clearFormatting"
-                                title="Clear formatting"
-                            >
-                                Clear
-                            </button>
-
-                        </div>
+                <div
+                    class="redmont-editor"
+                    data-input="content"
+                >
 
 
-                        <div
-                            class="redmont-editor-surface"
-                            contenteditable="true"
-                            spellcheck="true"
-                            aria-label="Page content editor"
-                        ></div>
+                    <div class="redmont-editor-toolbar">
+
+
+                        <button
+                            type="button"
+                            data-command="bold"
+                            title="Bold"
+                        >
+                            <strong>B</strong>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="italic"
+                            title="Italic"
+                        >
+                            <em>I</em>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="underline"
+                            title="Underline"
+                        >
+                            <u>U</u>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="strikeThrough"
+                            title="Strikethrough"
+                        >
+                            <s>S</s>
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyLeft"
+                            title="Align left"
+                        >
+                            Left
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyCenter"
+                            title="Center"
+                        >
+                            Center
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="justifyRight"
+                            title="Align right"
+                        >
+                            Right
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="insertUnorderedList"
+                            title="Bullet list"
+                        >
+                            • List
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="insertOrderedList"
+                            title="Numbered list"
+                        >
+                            1. List
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h1"
+                            title="Heading 1"
+                        >
+                            H1
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h2"
+                            title="Heading 2"
+                        >
+                            H2
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="h3"
+                            title="Heading 3"
+                        >
+                            H3
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-command="formatBlock"
+                            data-value="p"
+                            title="Paragraph"
+                        >
+                            P
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="fontSize"
+                            title="Font size"
+                        >
+                            Size
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="fontColor"
+                            title="Font color"
+                        >
+                            Color
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="link"
+                            title="Insert link"
+                        >
+                            Link
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="image"
+                            title="Insert image"
+                        >
+                            Image
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="table"
+                            title="Insert table"
+                        >
+                            Table
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="checklist"
+                            title="Insert checklist"
+                        >
+                            ☑ Checklist
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="footer"
+                            title="Insert footer"
+                        >
+                            Footer
+                        </button>
+
+
+                        <button
+                            type="button"
+                            data-action="clearFormatting"
+                            title="Clear formatting"
+                        >
+                            Clear
+                        </button>
+
 
                     </div>
 
 
-                    <br><br>
+                    <div
+                        class="redmont-editor-surface"
+                        contenteditable="true"
+                        spellcheck="true"
+                        aria-label="Page content editor"
+                    ></div>
 
 
-                    <label for="status">
-                        Page Status
-                    </label>
-
-                    <select
-                        id="status"
-                        name="status"
-                        required
-                    >
-
-                        <option value="draft">
-                            Draft
-                        </option>
-
-                        <option value="published">
-                            Published
-                        </option>
-
-                    </select>
+                </div>
 
 
-                    <br><br>
+                <br>
+                <br>
 
 
-                    <button
-                        type="submit"
-                        id="create-button"
-                    >
-                        Create Page
-                    </button>
+                <label for="status">
+                    Page Status
+                </label>
 
-                </form>
+                <select
+                    id="status"
+                    name="status"
+                    required
+                >
+
+                    <option value="draft">
+                        Draft
+                    </option>
+
+                    <option value="published">
+                        Published
+                    </option>
+
+                </select>
 
 
-                <div
-                    id="result"
-                    hidden
-                ></div>
+                <br>
+                <br>
 
-            </div>
+
+                <button
+                    type="submit"
+                    id="create-button"
+                >
+                    Create Page
+                </button>
+
+
+            </form>
+
+
+            <div
+                id="result"
+                hidden
+            ></div>
+
 
         </div>
 
-    </section>
+    </div>
+
+</section>
+
 
 </main>
+
 
 
 <footer>
@@ -404,23 +472,35 @@
 </footer>
 
 
-<!-- Rich-text editor functionality -->
-<script src="/editor.js"></script>
+
+<script src="/editor.js?v=2"></script>
 
 
 <script>
 
 const form =
-    document.getElementById("page-form");
+    document.getElementById(
+        "page-form"
+    );
+
 
 const result =
-    document.getElementById("result");
+    document.getElementById(
+        "result"
+    );
+
 
 const button =
-    document.getElementById("create-button");
+    document.getElementById(
+        "create-button"
+    );
+
 
 const organizationSelect =
-    document.getElementById("organization-id");
+    document.getElementById(
+        "organization-id"
+    );
+
 
 
 async function loadOrganizations() {
@@ -428,18 +508,26 @@ async function loadOrganizations() {
     try {
 
         const response =
-            await fetch("/api/organizations");
+            await fetch(
+                "/api/organizations"
+            );
+
 
         if (!response.ok) {
+
             throw new Error(
                 "Unable to load organizations."
             );
+
         }
+
 
         const data =
             await response.json();
 
-        organizationSelect.innerHTML = "";
+
+        organizationSelect.innerHTML =
+            "";
 
 
         if (
@@ -459,16 +547,26 @@ async function loadOrganizations() {
 
 
         const placeholder =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        placeholder.value = "";
+
+        placeholder.value =
+            "";
+
 
         placeholder.textContent =
             "Select an organization...";
 
-        placeholder.disabled = true;
 
-        placeholder.selected = true;
+        placeholder.disabled =
+            true;
+
+
+        placeholder.selected =
+            true;
+
 
         organizationSelect.appendChild(
             placeholder
@@ -479,13 +577,18 @@ async function loadOrganizations() {
             organization => {
 
                 const option =
-                    document.createElement("option");
+                    document.createElement(
+                        "option"
+                    );
+
 
                 option.value =
                     organization.id;
 
+
                 option.textContent =
                     organization.name;
+
 
                 organizationSelect.appendChild(
                     option
@@ -500,8 +603,11 @@ async function loadOrganizations() {
                 window.location.search
             );
 
+
         const requestedSlug =
-            params.get("organization");
+            params.get(
+                "organization"
+            );
 
 
         if (requestedSlug) {
@@ -528,6 +634,7 @@ async function loadOrganizations() {
 
         console.error(error);
 
+
         organizationSelect.innerHTML = `
             <option value="">
                 Unable to load organizations
@@ -537,6 +644,7 @@ async function loadOrganizations() {
     }
 
 }
+
 
 
 form.addEventListener(
@@ -552,32 +660,36 @@ form.addEventListener(
 
         const title =
             document
-                .getElementById("title")
+                .getElementById(
+                    "title"
+                )
                 .value
                 .trim();
 
 
         const slug =
             document
-                .getElementById("slug")
+                .getElementById(
+                    "slug"
+                )
                 .value
                 .trim();
 
 
-        /*
-         * editor.js synchronizes the editor
-         * with this hidden input.
-         */
         const content =
             document
-                .getElementById("content")
+                .getElementById(
+                    "content"
+                )
                 .value
                 .trim();
 
 
         const status =
             document
-                .getElementById("status")
+                .getElementById(
+                    "status"
+                )
                 .value;
 
 
@@ -595,22 +707,28 @@ form.addEventListener(
                 </p>
             `;
 
-            result.hidden = false;
+            result.hidden =
+                false;
 
             return;
 
         }
 
 
-        button.disabled = true;
+        button.disabled =
+            true;
+
 
         button.textContent =
             "Creating...";
 
 
-        result.hidden = true;
+        result.hidden =
+            true;
 
-        result.innerHTML = "";
+
+        result.innerHTML =
+            "";
 
 
         try {
@@ -691,29 +809,33 @@ form.addEventListener(
             `;
 
 
-            result.hidden = false;
+            result.hidden =
+                false;
 
 
             form.reset();
 
 
-            /*
-             * Clear the rich-text editor after
-             * successfully creating the page.
-             */
             const editor =
                 document.querySelector(
                     ".redmont-editor-surface"
                 );
 
+
             if (editor) {
-                editor.innerHTML = "";
+
+                editor.innerHTML =
+                    "";
+
             }
 
 
             document
-                .getElementById("content")
-                .value = "";
+                .getElementById(
+                    "content"
+                )
+                .value =
+                "";
 
 
             await loadOrganizations();
@@ -721,7 +843,9 @@ form.addEventListener(
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
 
             result.innerHTML = `
@@ -741,12 +865,15 @@ form.addEventListener(
             `;
 
 
-            result.hidden = false;
+            result.hidden =
+                false;
 
 
         } finally {
 
-            button.disabled = false;
+            button.disabled =
+                false;
+
 
             button.textContent =
                 "Create Page";
@@ -755,6 +882,7 @@ form.addEventListener(
 
     }
 );
+
 
 
 function escapeHTML(value) {
@@ -789,11 +917,12 @@ function escapeHTML(value) {
 }
 
 
+
 loadOrganizations();
 
 </script>
 
+
 </body>
 
 </html>
-```
