@@ -18,17 +18,12 @@
     <div class="container nav">
 
         <a class="brand" href="/">
-            <img
-                src="/logo.svg"
-                alt="Redmont Archives logo"
-                class="logo"
-            >
+            <span class="mark">RA</span>
             <span>Redmont Archives</span>
         </a>
 
         <nav>
             <a href="/">Archive</a>
-            <a href="/organizations.html">Organizations</a>
             <a href="/#categories">Categories</a>
             <a href="/#about">About</a>
         </nav>
@@ -131,18 +126,18 @@
                         Page Content
                     </label>
 
-
                     <!--
-                        The hidden input stores the HTML generated
-                        by the editor and is submitted to the API.
+                        This hidden input contains the HTML
+                        produced by the rich text editor.
                     -->
-
                     <input
                         type="hidden"
                         id="content"
                         name="content"
                     >
 
+
+                    <!-- RICH TEXT EDITOR -->
 
                     <div
                         class="redmont-editor"
@@ -341,7 +336,7 @@
                     </div>
 
 
-                    <br>
+                    <br><br>
 
 
                     <label for="status">
@@ -409,6 +404,7 @@
 </footer>
 
 
+<!-- Rich-text editor functionality -->
 <script src="/editor.js"></script>
 
 
@@ -458,6 +454,7 @@ async function loadOrganizations() {
             `;
 
             return;
+
         }
 
 
@@ -482,9 +479,7 @@ async function loadOrganizations() {
             organization => {
 
                 const option =
-                    document.createElement(
-                        "option"
-                    );
+                    document.createElement("option");
 
                 option.value =
                     organization.id;
@@ -570,11 +565,9 @@ form.addEventListener(
 
 
         /*
-         * editor.js automatically keeps the
-         * hidden #content field synchronized
-         * with the editor HTML.
+         * editor.js synchronizes the editor
+         * with this hidden input.
          */
-
         const content =
             document
                 .getElementById("content")
@@ -592,9 +585,11 @@ form.addEventListener(
 
             result.innerHTML = `
                 <br>
+
                 <div class="eyebrow">
                     ERROR
                 </div>
+
                 <p>
                     Please enter some page content.
                 </p>
@@ -703,10 +698,9 @@ form.addEventListener(
 
 
             /*
-             * Reset the editor after creating
-             * the page.
+             * Clear the rich-text editor after
+             * successfully creating the page.
              */
-
             const editor =
                 document.querySelector(
                     ".redmont-editor-surface"
@@ -715,6 +709,11 @@ form.addEventListener(
             if (editor) {
                 editor.innerHTML = "";
             }
+
+
+            document
+                .getElementById("content")
+                .value = "";
 
 
             await loadOrganizations();
