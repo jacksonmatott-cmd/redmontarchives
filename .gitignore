@@ -1,0 +1,10 @@
+node_modules/
+.local/
+.backups/
+.env
+.dev.vars
+.wrangler/
+test-results/
+*.log
+*.zip
+owner-setup.sql

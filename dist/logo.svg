@@ -1,0 +1,47 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 256 256"
+>
+
+    <!-- Left page -->
+    <path
+        d="M32 56
+           C68 42 94 48 128 70
+           V214
+           C94 192 68 188 32 202
+           Z"
+        fill="#F4B942"
+    />
+
+    <!-- Right page -->
+    <path
+        d="M224 56
+           C188 42 162 48 128 70
+           V214
+           C162 192 188 188 224 202
+           Z"
+        fill="#D9951A"
+    />
+
+    <!-- Center binding -->
+    <path
+        d="M128 70
+           V214"
+        stroke="#B87912"
+        stroke-width="8"
+        stroke-linecap="round"
+    />
+
+    <!-- Bottom page line -->
+    <path
+        d="M32 202
+           C68 188 94 192 128 214
+           C162 192 188 188 224 202"
+        fill="none"
+        stroke="#A86F10"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+    />
+
+</svg>
