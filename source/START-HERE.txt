@@ -1,0 +1,16 @@
+REDMONT ARCHIVES 2.0.1
+
+Use Redmont-Archives-Cloudflare-Upload.zip as your website download.
+
+Direct Upload Pages project: upload that ZIP and deploy.
+Existing Git-connected project: extract it and run DEPLOY-CLOUDFLARE.cmd.
+Sign in to Cloudflare if asked. The launcher requires Node.js installed once.
+
+Everything is already built. The database upgrades automatically. Keep the
+existing D1 database binding named DB. Existing accounts and records are kept.
+
+This secondary package contains editable source. Its dist folder also holds
+the finished files. DEPLOY-CLOUDFLARE.cmd in this folder can deploy that dist
+without building it again.
+
+All future versions must use this ready-to-upload delivery format.

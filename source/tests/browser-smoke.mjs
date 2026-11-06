@@ -1,0 +1,50 @@
+import assert from 'node:assert/strict';
+import {resolve} from 'node:path';
+import {mkdir} from 'node:fs/promises';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
+const {server,db}=await import('../tools/local-server.mjs');
+const executablePath=process.env.REDMONT_CHROMIUM;
+const browser=await chromium.launch({headless:true,...(executablePath?{executablePath,args:['--no-sandbox','--disable-dev-shm-usage','--no-zygote','--single-process','--use-gl=angle','--use-angle=swiftshader','--in-process-gpu']}: {})});
+const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage(),errors=[];
+await page.route('https://images.example.test/archive.png',route=>route.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jKtkAAAAASUVORK5CYII=','base64')}));
+const base='http://127.0.0.1:8788';await mkdir('test-results',{recursive:true});
+page.on('pageerror',e=>errors.push(e.message));
+const checkOverflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'No horizontal page overflow');
+async function login(username,password='RedmontDemo-2026!'){
+ await page.goto(base+'/login');await page.getByLabel('Username',{exact:true}).fill(username);await page.getByLabel('Password',{exact:true}).fill(password);await page.locator('#auth-form button').click();await page.waitForURL('**/account');await page.getByRole('heading',{name:username,exact:true}).waitFor();
+}
+try{
+ await page.goto(base);await page.getByText('The record of Redmont,').waitFor();await page.locator('#recent .record-row').first().waitFor();await checkOverflow();await page.screenshot({path:'test-results/home-desktop.png',fullPage:true});
+ assert.equal(await page.getByRole('link',{name:'Create record',exact:true}).count(),0);
+ await login('kaelzvx');
+ await page.goto(base+'/edit?kind=record');await page.getByLabel('Title',{exact:true}).fill('Browser verified record '+Date.now());
+ const surface=page.getByRole('textbox',{name:'Document content',exact:true});await surface.fill('A formatted public record.');
+ await surface.evaluate(el=>{const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);el.dispatchEvent(new MouseEvent('mouseup',{bubbles:true}));});
+ await page.getByRole('button',{name:'Bold',exact:true}).click();await page.getByLabel('Font size',{exact:true}).selectOption('24');
+ console.log('Font formatting:',await surface.innerHTML());
+ assert.match(await surface.innerHTML(),/font-size:\s*24px/,'Font size control applies actual pixels');
+ await surface.press('End');
+ await page.getByRole('button',{name:'Table',exact:true}).click();await page.getByLabel('Rows',{exact:true}).fill('2');await page.getByLabel('Columns',{exact:true}).fill('2');await page.locator('dialog button.primary').click();
+ await page.getByRole('button',{name:'☑ Checklist',exact:true}).click();await page.getByRole('button',{name:'Header',exact:true}).click();await page.getByRole('button',{name:'Footer',exact:true}).click();
+ await surface.locator('input[type=checkbox]').first().check();
+ await page.getByRole('button',{name:'Link',exact:true}).click();await page.getByLabel('Link URL',{exact:true}).fill('https://example.test/source');await page.locator('dialog button.primary').click();
+ await page.getByRole('button',{name:'Image',exact:true}).click();await page.getByLabel('Image URL (HTTPS)',{exact:true}).fill('https://images.example.test/archive.png');await page.getByLabel('Image description (alt text)',{exact:true}).fill('Browser image insertion fixture');await page.locator('dialog button.primary').click();
+ await page.getByRole('button',{name:'Preview',exact:true}).click();assert.equal(await page.locator('#editor-preview table').count(),1);await page.getByRole('button',{name:'Write',exact:true}).click();
+ await page.screenshot({path:'test-results/editor-desktop.png',fullPage:true});
+ await page.getByRole('button',{name:'Publish record',exact:true}).click();await page.locator('#save-state').filter({hasText:'Saved and published'}).waitFor();
+ const editURL=page.url();await page.getByRole('link',{name:'View record',exact:true}).click();await page.locator('#record-content table').waitFor();
+ assert.match(await page.locator('#record-content').innerHTML(),/font-size:\s*24px/);assert.equal(await page.locator('#record-content [data-editor-footer]').count(),1);
+ assert.equal(await page.locator('#record-content input:disabled').count(),2);
+ assert.equal(await page.locator('#record-content input:checked').count(),1);assert.equal(await page.locator('#record-content a[href="https://example.test/source"]').count(),1);assert.equal(await page.locator('#record-content img[alt="Browser image insertion fixture"]').count(),1);
+ await page.screenshot({path:'test-results/record-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});await checkOverflow();await page.screenshot({path:'test-results/record-mobile.png',fullPage:true});
+ await page.goto(editURL);await surface.waitFor();await surface.press('Control+End');await surface.press('Enter');await surface.pressSequentially('Edited text appears publicly.');
+ await page.getByRole('button',{name:'Save published record',exact:true}).click();await page.locator('#save-state').filter({hasText:'Revision 2'}).waitFor();await page.getByRole('link',{name:'View record',exact:true}).click();await page.getByText('Edited text appears publicly.',{exact:false}).waitFor();
+ await page.goto(base+'/account');await page.getByRole('button',{name:'Log out',exact:true}).click();await page.waitForURL(base+'/');
+ const username='uitest'+Date.now();await page.goto(base+'/register');await page.getByLabel('Username',{exact:true}).fill(username);await page.getByLabel('Password',{exact:true}).fill('Browser-Password-123!');await page.getByLabel('Confirm password',{exact:true}).fill('Browser-Password-123!');await page.getByLabel('Show password',{exact:true}).check();assert.equal(await page.locator('input[name=password]').getAttribute('type'),'text');await page.getByRole('button',{name:'Create account',exact:true}).click();await page.locator('[data-code]').waitFor();const code=await page.locator('[data-code]').textContent();assert.equal(code.length,43);
+ await page.goto(base+'/reset-password');await page.getByLabel('Username',{exact:true}).fill(username);await page.getByLabel('Recovery code',{exact:true}).fill(code);await page.getByLabel('New password',{exact:true}).fill('Replacement-Password-123!');await page.getByLabel('Confirm password',{exact:true}).fill('Replacement-Password-123!');await page.getByRole('button',{name:'Reset password',exact:true}).click();await page.locator('[data-code]').waitFor();assert.notEqual(await page.locator('[data-code]').textContent(),code);
+ await login(username,'Replacement-Password-123!');
+ assert.equal(await page.getByRole('link',{name:'Create record',exact:true}).count(),0);
+ await page.goto(base+'/organizations');await page.getByRole('link',{name:'Create organization',exact:true}).click();await page.getByLabel('Name',{exact:true}).fill('Browser Organization '+Date.now());await page.getByLabel('Description',{exact:true}).fill('Browser-tested organization.');await page.locator('#create-org button').click();await page.waitForURL(/\/organizations\//);await page.getByRole('link',{name:'Create page',exact:true}).click();await page.getByLabel('Title',{exact:true}).fill('Browser organization page');await page.getByRole('textbox',{name:'Document content',exact:true}).fill('Organization editing is working.');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.locator('#save-state').filter({hasText:'Saved as a draft'}).waitFor();await page.getByRole('button',{name:'Publish record',exact:true}).click();await page.locator('#save-state').filter({hasText:'Saved and published'}).waitFor();await page.getByRole('link',{name:'View record',exact:true}).click();await page.getByText('Organization editing is working.',{exact:true}).waitFor();await checkOverflow();
+ assert.deepEqual(errors,[]);console.log('Browser smoke passed: desktop/mobile layouts, formatting, preview, published edits, registration, recovery, organization drafts and publishing.');
+}finally{await browser.close();await new Promise(r=>server.close(r));db.close();}

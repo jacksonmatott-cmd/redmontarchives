@@ -1,0 +1,10 @@
+{
+  "name": "redmont-archives-deployment",
+  "version": "2.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "description": "Prebuilt Redmont Archives deployment; editable application is in source/."
+}
