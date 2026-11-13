@@ -25,5 +25,14 @@ export const migrations = [
       "CREATE INDEX IF NOT EXISTS ra_audit_org ON ra_audit(organization_id,id DESC)",
       "CREATE INDEX IF NOT EXISTS ra_limits_expiry ON ra_rate_limits(expires_at)"
     ]
+  },
+  {
+    "id": "002-workspace.sql",
+    "checksum": "316800b20fcf93fc024c6afa4172146f76065a3e2970f5b7034c5ec1633f49dd",
+    "statements": [
+      "CREATE TABLE IF NOT EXISTS ra_document_details (\n kind TEXT NOT NULL CHECK(kind IN ('record','page')), document_id INTEGER NOT NULL,\n tags TEXT NOT NULL DEFAULT '[]', summary TEXT NOT NULL DEFAULT '', notes TEXT NOT NULL DEFAULT '',\n updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY(kind,document_id)\n)",
+      "CREATE TABLE IF NOT EXISTS ra_corrections (\n id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, document_id INTEGER NOT NULL,\n reporter_user_id INTEGER NOT NULL REFERENCES users(id), message TEXT NOT NULL,\n status TEXT NOT NULL DEFAULT 'open' CHECK(status IN ('open','resolved')),\n created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+      "CREATE INDEX IF NOT EXISTS ra_corrections_status ON ra_corrections(status,id DESC)"
+    ]
   }
 ];

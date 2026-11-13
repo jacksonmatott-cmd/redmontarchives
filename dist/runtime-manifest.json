@@ -1,0 +1,61 @@
+{
+  "version": "2.1.0",
+  "files": [
+    {
+      "name": "404.html",
+      "sha256": "6cee7cf1836248bc709c8c7d676d03300c01f025e24632ea185459eaf07cd191"
+    },
+    {
+      "name": "DEPLOY-CLOUDFLARE.cmd",
+      "sha256": "2763f732a16483c1fd5a7a0304f4b17f62459a6db0b37568d283ece278860b41"
+    },
+    {
+      "name": "UPLOAD-README.txt",
+      "sha256": "2555b17e32be5066d361557f0ef7c7956e44ecbb901fec16532d2c10276fba33"
+    },
+    {
+      "name": "_routes.json",
+      "sha256": "681a11dea21db27454abb43420956f4024990cf0d1ba1801165fc285757db6af"
+    },
+    {
+      "name": "_worker.js",
+      "sha256": "fa865f905e37a80610d7a2cb6840318cb0321645a92b027bfa76000f1f84404f"
+    },
+    {
+      "name": "app.js",
+      "sha256": "345d01f73b64d86a48fc25152d2cdc01a80be12ef6b1edf539d88db57ff97a7d"
+    },
+    {
+      "name": "favicon.ico",
+      "sha256": "e5995bbd7734fc7a85dea641af90694356ebfa8f29f4fd2a6c0c5edf075093c8"
+    },
+    {
+      "name": "favicon.svg",
+      "sha256": "a54de880a5abf246a4a112899252aa289ea23dbd87676aef0cf96801eb3d52af"
+    },
+    {
+      "name": "index.html",
+      "sha256": "8b711391978f8b74be470902238607734c84785660236d26a271b12648593af6"
+    },
+    {
+      "name": "logo.svg",
+      "sha256": "c34c57d85a3786adc2e05aec81ae1a97b78d9e727dd26a3731179072425024e8"
+    },
+    {
+      "name": "priorities.json",
+      "sha256": "0239dc054d7315ced37042027545f20e490efc37b4846a6721fc3c104065bf3c"
+    },
+    {
+      "name": "robots.txt",
+      "sha256": "5622bc3f7b4c4e86eab25c7b6a8c83143b309332e49deb9d9c12af2b2187232f"
+    },
+    {
+      "name": "styles.css",
+      "sha256": "bf9570bd684590379e19d38fd023f2d36149525bb9451d22110c07c0600cbd03"
+    },
+    {
+      "name": "workspace.css",
+      "sha256": "bb27c2bb900312c3e13c3747f2b683b2e515d2347f5394ec1c5000456afc02d9"
+    }
+  ]
+}

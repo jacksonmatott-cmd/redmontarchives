@@ -1,3 +1,7 @@
+# Redmont Archives 2.1 update
+
+The complete implemented priority list is in `PRIORITIES-100.md`. It is also available from Help in the site. Run `npm run release` to validate, rebuild and synchronize runtime files for the existing GitHub deployment.
+
 # Redmont Archives 2.0.1
 
 The main deliverable is **`Redmont-Archives-Cloudflare-Upload.zip`**. It contains the finished site with `index.html`, `_worker.js`, the browser bundle, styles, and assets at the ZIP root. It needs no application build or separate database upgrade.

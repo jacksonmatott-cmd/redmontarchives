@@ -30,9 +30,9 @@ async function legacy(db){
 
 test('a blank D1 initializes from the first API request without a separate SQL command',async t=>{
  const db=openDatabase(':memory:',false);t.after(()=>db.close());
- const result=await call(db,'/api/health');assert.equal(result.status,200);assert.equal(result.data.version,'2.0.1');assert.equal(result.data.database,'ready');
+ const result=await call(db,'/api/health');assert.equal(result.status,200);assert.equal(result.data.version,'2.1.0');assert.equal(result.data.database,'ready');
  const registered=await call(db,'/api/register',{method:'POST',body:{username:'ReadyReader',password:'Reader-Password-123!'}});assert.equal(registered.status,201);assert.equal(registered.data.recovery_code.length,43);
- assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,1);
+ assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,2);
 });
 test('first deployment automatically upgrades a legacy database and keeps existing login, IDs and content',async t=>{
  const db=openDatabase(':memory:',false);t.after(()=>db.close());const old=await legacy(db);
@@ -51,7 +51,7 @@ test('first deployment automatically upgrades a legacy database and keeps existi
 test('two independent isolates can initialize the same database without duplicate upgrades',async t=>{
  const db=openDatabase(':memory:',false);t.after(()=>db.close());
  await Promise.all([ensureDatabase({...db}),ensureDatabase({...db})]);
- assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,1);
+ assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,2);
  assert.equal((await call(db,'/api/health')).status,200);
 });
 test('a failed automatic upgrade is retried and never marked as completed early',async t=>{
@@ -59,7 +59,7 @@ test('a failed automatic upgrade is retried and never marked as completed early'
  const binding={...db,batch(statements){if(fail){fail=false;throw new Error('Temporary database interruption');}return db.batch(statements);}};
  await assert.rejects(()=>ensureDatabase(binding),/Temporary database interruption/);
  assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,0);
- await ensureDatabase(binding);assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,1);
+ await ensureDatabase(binding);assert.equal(db.prepare('SELECT count(*) AS n FROM ra_schema_migrations').first().n,2);
 });
 test('a repository-root deployment never serves its editable source or build metadata',async()=>{
  for(const path of ['/source/src/security.js','/src/security.js','/tools/build.mjs','/tests/archives.test.mjs','/package.json','/build.mjs','/AGENTS.md']){

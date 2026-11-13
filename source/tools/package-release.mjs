@@ -29,7 +29,7 @@ if(deployed.some(x=>x.name.startsWith('dist/')||x.name.startsWith('src/')))throw
 const upload=await zip(join(output,'Redmont-Archives-Cloudflare-Upload.zip'),deployed);
 let files=[];
 for(const directory of ['src','public','dist','tools','migrations','tests','docs'])files.push(...await tree(join(root,directory)));
-for(const file of ['AGENTS.md','package.json','package-lock.json','.gitignore','README.md','START-HERE.txt','UPLOAD-README.txt','START-WINDOWS.cmd','DEPLOY-WINDOWS.cmd','DEPLOY-CLOUDFLARE.cmd','THIRD-PARTY-NOTICES.txt'])files.push(join(root,file));
+for(const file of ['PRIORITIES-100.json','PRIORITIES-100.md','AGENTS.md','package.json','package-lock.json','.gitignore','README.md','START-HERE.txt','UPLOAD-README.txt','START-WINDOWS.cmd','DEPLOY-WINDOWS.cmd','DEPLOY-CLOUDFLARE.cmd','THIRD-PARTY-NOTICES.txt'])files.push(join(root,file));
 const checks=[];for(const path of files.sort())checks.push(hash(await readFile(path))+'  '+relative(root,path).replaceAll('\\','/'));
 const meta={version:VERSION,primary_artifact:'Redmont-Archives-Cloudflare-Upload.zip',automatic_database_upgrade:true,local_build_required_for_user:false,live_deployment_performed:false};
 const sourceEntries=files.map(path=>({path,name:'Redmont-Archives-Source/'+relative(root,path).replaceAll('\\','/')}));

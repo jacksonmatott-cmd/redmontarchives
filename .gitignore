@@ -8,3 +8,5 @@ test-results/
 *.log
 *.zip
 owner-setup.sql
+
+/source/dist/

@@ -6,12 +6,15 @@ export async function orgRole(db,user,org){
  if(!user)return null;if(+org.owner_user_id===+user.id)return 'owner';
  return (await db.prepare('SELECT role FROM ra_org_roles WHERE organization_id=? AND user_id=?').bind(org.id,user.id).first())?.role||null;
 }
-export async function organization(db,key){
- return db.prepare(`SELECT o.*,COALESCE(s.deleted,0) AS deleted FROM organizations o LEFT JOIN ra_org_state s ON s.organization_id=o.id WHERE ${/^\d+$/.test(String(key))?'o.id':'o.slug'}=?`).bind(key).first();
+export async function organization(db,key,mode=typeof key==='number'?'id':'auto'){
+ const select='SELECT o.*,COALESCE(s.deleted,0) AS deleted FROM organizations o LEFT JOIN ra_org_state s ON s.organization_id=o.id WHERE ';
+ if(mode==='id')return db.prepare(select+'o.id=?').bind(key).first();
+ const bySlug=await db.prepare(select+'o.slug=?').bind(String(key)).first();
+ return bySlug||(mode==='auto'&&/^\d+$/.test(String(key))?await db.prepare(select+'o.id=?').bind(Number(key)).first():null);
 }
 export async function rawDocument(db,kind,id){
  const table=tableFor(kind);
- return db.prepare(`SELECT d.*,COALESCE(s.version,1) AS version,COALESCE(s.status,${kind==='page'?'d.status':"'published'"}) AS state_status,COALESCE(s.sources,'[]') AS sources FROM ${table} d LEFT JOIN ra_document_state s ON s.kind=? AND s.document_id=d.id WHERE d.id=?`).bind(kind,id).first();
+ return db.prepare(`SELECT d.* ,${kind==='page'?'o.slug AS organization_slug,':''}COALESCE(s.version,1) AS version,COALESCE(s.status,${kind==='page'?'d.status':"'published'"}) AS state_status,COALESCE(s.sources,'[]') AS sources FROM ${table} d ${kind==='page'?'LEFT JOIN organizations o ON o.id=d.organization_id':''} LEFT JOIN ra_document_state s ON s.kind=? AND s.document_id=d.id WHERE d.id=?`).bind(kind,id).first();
 }
 export async function canEdit(db,user,kind,doc){
  if(kind==='record')return isAdmin(user);
@@ -29,7 +32,7 @@ export async function requireDocument(db,user,kind,id,edit=false){
 }
 export function publicDocument(kind,doc){
  const {state_status,sources,password_hash,...rest}=doc;
- return {...rest,kind,status:state_status,content:cleanContent(doc.content),excerpt:plainText(doc.content).slice(0,240),sources:parseSources(sources),url:kind==='record'?`/records/${doc.id}`:`/organizations/${doc.organization_slug||doc.organization_id}/${doc.slug}`};
+ return {...rest,kind,status:state_status,content:cleanContent(doc.content),excerpt:doc.summary||plainText(doc.content).slice(0,240),sources:parseSources(sources),url:kind==='record'?`/records/${doc.id}`:`/organizations/${doc.organization_slug||doc.organization_id}/${doc.slug}`};
 }
 function validate(body,kind){
  const title=typeof body.title==='string'?body.title.trim():'';
@@ -83,7 +86,7 @@ export async function documentList(db,user,filters={}){
  const kind=filters.kind||'record',table=tableFor(kind),where=[],values=[kind];
  let manage=false;
  if(kind==='page'){
-  const org=await organization(db,filters.organization_id??filters.organization);
+  const org=await organization(db,filters.organization_id!==undefined?Number(filters.organization_id):filters.organization);
   if(!org||org.deleted)fail(404,'Organization not found.');
   where.push('d.organization_id=?');values.push(org.id);
   manage=filters.manage&&['owner','editor'].includes(await orgRole(db,user,org));
@@ -94,9 +97,10 @@ export async function documentList(db,user,filters={}){
  if(filters.category){if(kind!=='record')fail(400,'Collections apply to main archive records.');where.push('lower(d.category)=lower(?)');values.push(filters.category);}
  const q=String(filters.q||'').trim().slice(0,200);
  if(q){where.push("(d.title LIKE ? ESCAPE '\\' OR d.content LIKE ? ESCAPE '\\')");const like='%'+q.replace(/[\\%_]/g,'\\$&')+'%';values.push(like,like);}
- const limit=Math.floor(Math.min(100,Math.max(1,+filters.limit||30))),offset=Math.floor(Math.max(0,Math.min(100000,+filters.offset||0)));
- const from=`FROM ${table} d LEFT JOIN ra_document_state s ON s.kind=? AND s.document_id=d.id`;
+ const bounded=(v,f,max)=>Number.isFinite(Number(v))?Math.floor(Math.max(0,Math.min(max,Number(v)))):f;
+ const limit=bounded(filters.limit,30,100)||30,offset=bounded(filters.offset,0,100000);
+ const from=`FROM ${table} d ${kind==='page'?'LEFT JOIN organizations o ON o.id=d.organization_id':''} LEFT JOIN ra_document_state s ON s.kind=? AND s.document_id=d.id LEFT JOIN ra_document_details md ON md.kind='${kind}' AND md.document_id=d.id`;
  const count=await db.prepare(`SELECT COUNT(*) AS total ${from} ${where.length?'WHERE '+where.join(' AND '):''}`).bind(...values).first();
- const list=await db.prepare(`SELECT d.*,COALESCE(s.version,1) AS version,${state} AS state_status,COALESCE(s.sources,'[]') AS sources ${from} ${where.length?'WHERE '+where.join(' AND '):''} ORDER BY d.updated_at DESC,d.id DESC LIMIT ? OFFSET ?`).bind(...values,limit,offset).all();
+ const list=await db.prepare(`SELECT d.*,${kind==='page'?'o.slug AS organization_slug,':''}md.summary,COALESCE(s.version,1) AS version,${state} AS state_status,COALESCE(s.sources,'[]') AS sources ${from} ${where.length?'WHERE '+where.join(' AND '):''} ORDER BY d.updated_at DESC,d.id DESC LIMIT ? OFFSET ?`).bind(...values,limit,offset).all();
  return {documents:list.results.map(x=>publicDocument(kind,{...x,can_edit:Boolean(manage)})),total:count.total,limit,offset};
 }
