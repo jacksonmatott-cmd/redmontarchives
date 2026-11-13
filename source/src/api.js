@@ -5,6 +5,7 @@ import {search,ask} from './search.js';
 import {CATEGORIES,cleanContent,parseSources} from './content.js';
 import {ensureDatabase} from './schema.js';
 import {VERSION} from './version.js';
+import {extendedRoute} from './extended-api.js';
 
 const positive=value=>{const n=Number(value);if(!Number.isSafeInteger(n)||n<1)fail(400,'Invalid record ID.');return n;};
 async function ownerOnly(db,user,org){requireUser(user);if(!org)fail(404,'Organization not found.');if(await orgRole(db,user,org)!=='owner')fail(403,'Only the organization owner can do this.');}
@@ -22,6 +23,7 @@ export async function api(request,env){
   await ensureDatabase(db);
   const user=await currentUser(request,db);
   const auth=await authRoute(path,request,db,user,body);if(auth)return auth;
+  const extended=await extendedRoute(path,request,db,user,body,url);if(extended)return extended;
   if(path==='/api/health'&&method==='GET'){
    await db.prepare('SELECT 1 FROM ra_document_state LIMIT 1').all();return json({ok:true,version:VERSION,database:'ready'});
   }
@@ -44,10 +46,10 @@ export async function api(request,env){
    ]);
    return json({success:true,organization:await organization(db,slug)},201);
   }
-  let match=path.match(/^\/api\/organizations\/([^/]+)(?:\/(pages|members|audit))?$/);
+  let match=path.match(/^\/api\/organizations\/(?:(id)\/)?([^/]+)(?:\/(pages|members|audit))?$/);
   if(match){
-   const org=await organization(db,decodeURIComponent(match[1]));if(!org)fail(404,'Organization not found.');
-   const role=await orgRole(db,user,org),sub=match[2];
+   const org=await organization(db,decodeURIComponent(match[2]),match[1]?'id':'auto');if(!org)fail(404,'Organization not found.');
+   const role=await orgRole(db,user,org),sub=match[3];
    if(org.deleted&&role!=='owner')fail(404,'Organization not found.');
    if(!sub&&method==='GET')return json({organization:{...org,role},can_edit:!org.deleted&&['owner','editor'].includes(role)});
    if(!sub&&(method==='PUT'||method==='DELETE')){
@@ -94,7 +96,7 @@ export async function api(request,env){
    }
   }
   if(path==='/api/organization-owner'&&method==='GET'){
-   const org=await organization(db,url.searchParams.get('organization')||'');return json({authenticated:Boolean(user),owner:Boolean(org&&await orgRole(db,user,org)==='owner')});
+   const org=await organization(db,url.searchParams.get('organization')||'','slug');return json({authenticated:Boolean(user),owner:Boolean(org&&await orgRole(db,user,org)==='owner')});
   }
   if(path==='/api/documents'&&method==='GET')return json(await documentList(db,user,{...Object.fromEntries(url.searchParams),manage:url.searchParams.get('manage')==='1'}));
   if(path==='/api/documents'&&method==='POST')return json({success:true,document:await saveDocument(db,user,body.kind||'record',body)},201);
@@ -124,13 +126,15 @@ export async function api(request,env){
   }
   match=path.match(/^\/api\/organization-page\/([^/]+)\/([^/]+)$/);
   if(match&&method==='GET'){
-   const org=await organization(db,decodeURIComponent(match[1]));if(!org||org.deleted)fail(404,'Organization not found.');
+   const org=await organization(db,decodeURIComponent(match[1]),'slug');if(!org||org.deleted)fail(404,'Organization not found.');
    const row=await db.prepare('SELECT id FROM pages WHERE organization_id=? AND slug=?').bind(org.id,decodeURIComponent(match[2])).first();if(!row)fail(404,'Page not found.');
    return json({document:publicDocument('page',{...await requireDocument(db,user,'page',row.id),organization_slug:org.slug}),organization:org});
   }
   if((path==='/api/search'||path==='/api/organization-search')&&method==='GET'){
-   let org=null;if(url.searchParams.get('organization')){org=await organization(db,url.searchParams.get('organization'));if(!org||org.deleted)fail(404,'Organization not found.');}
-   return json({query:url.searchParams.get('q')||'',organization:org,results:await search(db,url.searchParams.get('q'),org)});
+   let org=null;if(url.searchParams.get('organization')){org=await organization(db,url.searchParams.get('organization'),'slug');if(!org||org.deleted)fail(404,'Organization not found.');}
+   const all=await search(db,url.searchParams.get('q'),org,500,Object.fromEntries(url.searchParams));
+   const offset=Math.max(0,Math.min(10000,Math.floor(Number(url.searchParams.get('offset'))||0))),limit=Math.max(1,Math.min(100,Math.floor(Number(url.searchParams.get('limit'))||30)));
+   return json({query:url.searchParams.get('q')||'',organization:org,results:all.slice(offset,offset+limit),total:all.length,offset,limit});
   }
   if((path==='/api/ask'||path==='/api/organization-ai')&&method==='POST'){
    let org=null;const key=body.organization||body.organizationSlug;

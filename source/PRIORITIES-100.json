@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "group": "Correctness",
+    "title": "Preserve legacy numeric organization slugs",
+    "status": "implemented"
+  },
+  {
+    "id": 2,
+    "group": "Correctness",
+    "title": "Use explicit ID routes for organization management",
+    "status": "implemented"
+  },
+  {
+    "id": 3,
+    "group": "Correctness",
+    "title": "Generate canonical slug URLs for pages",
+    "status": "implemented"
+  },
+  {
+    "id": 4,
+    "group": "Correctness",
+    "title": "Repair packaging with the missing source ignore file",
+    "status": "implemented"
+  },
+  {
+    "id": 5,
+    "group": "Correctness",
+    "title": "Return correct HEAD responses",
+    "status": "implemented"
+  },
+  {
+    "id": 6,
+    "group": "Correctness",
+    "title": "Reject writes to static page routes",
+    "status": "implemented"
+  },
+  {
+    "id": 7,
+    "group": "Correctness",
+    "title": "Handle malformed URL encoding without crashing",
+    "status": "implemented"
+  },
+  {
+    "id": 8,
+    "group": "Correctness",
+    "title": "Render invalid legacy timestamps safely",
+    "status": "implemented"
+  },
+  {
+    "id": 9,
+    "group": "Correctness",
+    "title": "Bound archive pagination to finite integers",
+    "status": "implemented"
+  },
+  {
+    "id": 10,
+    "group": "Correctness",
+    "title": "Protect dotfiles and private source paths",
+    "status": "implemented"
+  },
+  {
+    "id": 11,
+    "group": "Search",
+    "title": "Filter search to archive records or organization pages",
+    "status": "implemented"
+  },
+  {
+    "id": 12,
+    "group": "Search",
+    "title": "Search titles without searching full content",
+    "status": "implemented"
+  },
+  {
+    "id": 13,
+    "group": "Search",
+    "title": "Support exact phrase search",
+    "status": "implemented"
+  },
+  {
+    "id": 14,
+    "group": "Search",
+    "title": "Filter records by archive collection",
+    "status": "implemented"
+  },
+  {
+    "id": 15,
+    "group": "Search",
+    "title": "Filter results by earliest update date",
+    "status": "implemented"
+  },
+  {
+    "id": 16,
+    "group": "Search",
+    "title": "Filter results by latest update date",
+    "status": "implemented"
+  },
+  {
+    "id": 17,
+    "group": "Search",
+    "title": "Sort search by relevance, newest, oldest or title",
+    "status": "implemented"
+  },
+  {
+    "id": 18,
+    "group": "Search",
+    "title": "Paginate filtered search results",
+    "status": "implemented"
+  },
+  {
+    "id": 19,
+    "group": "Search",
+    "title": "Keep search filters in shareable URLs",
+    "status": "implemented"
+  },
+  {
+    "id": 20,
+    "group": "Search",
+    "title": "Reset all advanced search filters",
+    "status": "implemented"
+  },
+  {
+    "id": 21,
+    "group": "Reading",
+    "title": "Generate a document table of contents",
+    "status": "implemented"
+  },
+  {
+    "id": 22,
+    "group": "Reading",
+    "title": "Create shareable heading anchors",
+    "status": "implemented"
+  },
+  {
+    "id": 23,
+    "group": "Reading",
+    "title": "Show estimated reading time",
+    "status": "implemented"
+  },
+  {
+    "id": 24,
+    "group": "Reading",
+    "title": "Show document word count",
+    "status": "implemented"
+  },
+  {
+    "id": 25,
+    "group": "Reading",
+    "title": "Offer adjustable reader text size",
+    "status": "implemented"
+  },
+  {
+    "id": 26,
+    "group": "Reading",
+    "title": "Switch the reader between serif and sans-serif",
+    "status": "implemented"
+  },
+  {
+    "id": 27,
+    "group": "Reading",
+    "title": "Add a distraction-free reading mode",
+    "status": "implemented"
+  },
+  {
+    "id": 28,
+    "group": "Reading",
+    "title": "Add a back-to-top control",
+    "status": "implemented"
+  },
+  {
+    "id": 29,
+    "group": "Reading",
+    "title": "Copy a formatted record citation",
+    "status": "implemented"
+  },
+  {
+    "id": 30,
+    "group": "Reading",
+    "title": "Download a record as plain text",
+    "status": "implemented"
+  },
+  {
+    "id": 31,
+    "group": "Personal workspace",
+    "title": "Download a self-contained HTML record",
+    "status": "implemented"
+  },
+  {
+    "id": 32,
+    "group": "Personal workspace",
+    "title": "Bookmark records in this browser",
+    "status": "implemented"
+  },
+  {
+    "id": 33,
+    "group": "Personal workspace",
+    "title": "Browse a saved-record library",
+    "status": "implemented"
+  },
+  {
+    "id": 34,
+    "group": "Personal workspace",
+    "title": "Remove individual bookmarks",
+    "status": "implemented"
+  },
+  {
+    "id": 35,
+    "group": "Personal workspace",
+    "title": "Keep recently read record history",
+    "status": "implemented"
+  },
+  {
+    "id": 36,
+    "group": "Personal workspace",
+    "title": "Clear reading history",
+    "status": "implemented"
+  },
+  {
+    "id": 37,
+    "group": "Personal workspace",
+    "title": "Save reusable searches in this browser",
+    "status": "implemented"
+  },
+  {
+    "id": 38,
+    "group": "Personal workspace",
+    "title": "Keep recent search history",
+    "status": "implemented"
+  },
+  {
+    "id": 39,
+    "group": "Personal workspace",
+    "title": "Clear recent search history",
+    "status": "implemented"
+  },
+  {
+    "id": 40,
+    "group": "Personal workspace",
+    "title": "Explain browser-local storage and privacy",
+    "status": "implemented"
+  },
+  {
+    "id": 41,
+    "group": "Appearance and navigation",
+    "title": "Add a light appearance option",
+    "status": "implemented"
+  },
+  {
+    "id": 42,
+    "group": "Appearance and navigation",
+    "title": "Add a high-contrast appearance option",
+    "status": "implemented"
+  },
+  {
+    "id": 43,
+    "group": "Appearance and navigation",
+    "title": "Remember appearance preferences",
+    "status": "implemented"
+  },
+  {
+    "id": 44,
+    "group": "Appearance and navigation",
+    "title": "Reset appearance preferences",
+    "status": "implemented"
+  },
+  {
+    "id": 45,
+    "group": "Appearance and navigation",
+    "title": "Provide a collapsible mobile navigation menu",
+    "status": "implemented"
+  },
+  {
+    "id": 46,
+    "group": "Appearance and navigation",
+    "title": "Focus search with the slash shortcut",
+    "status": "implemented"
+  },
+  {
+    "id": 47,
+    "group": "Appearance and navigation",
+    "title": "Exit focus mode with Escape",
+    "status": "implemented"
+  },
+  {
+    "id": 48,
+    "group": "Appearance and navigation",
+    "title": "Publish from the editor with Ctrl+Enter",
+    "status": "implemented"
+  },
+  {
+    "id": 49,
+    "group": "Appearance and navigation",
+    "title": "Honor reduced-motion preferences",
+    "status": "implemented"
+  },
+  {
+    "id": 50,
+    "group": "Appearance and navigation",
+    "title": "Lazy-load published document images",
+    "status": "implemented"
+  },
+  {
+    "id": 51,
+    "group": "Document management",
+    "title": "Duplicate an editable record as a draft",
+    "status": "implemented"
+  },
+  {
+    "id": 52,
+    "group": "Document management",
+    "title": "Generate collision-free URLs for duplicated pages",
+    "status": "implemented"
+  },
+  {
+    "id": 53,
+    "group": "Document management",
+    "title": "Store structured document tags",
+    "status": "implemented"
+  },
+  {
+    "id": 54,
+    "group": "Document management",
+    "title": "Show public document tags",
+    "status": "implemented"
+  },
+  {
+    "id": 55,
+    "group": "Document management",
+    "title": "Filter search by a tag",
+    "status": "implemented"
+  },
+  {
+    "id": 56,
+    "group": "Document management",
+    "title": "Store an explicit document summary",
+    "status": "implemented"
+  },
+  {
+    "id": 57,
+    "group": "Document management",
+    "title": "Use summaries as public record excerpts",
+    "status": "implemented"
+  },
+  {
+    "id": 58,
+    "group": "Document management",
+    "title": "Store private editorial notes",
+    "status": "implemented"
+  },
+  {
+    "id": 59,
+    "group": "Document management",
+    "title": "Restrict editorial notes to authorized editors",
+    "status": "implemented"
+  },
+  {
+    "id": 60,
+    "group": "Document management",
+    "title": "Show related published records by shared tag",
+    "status": "implemented"
+  },
+  {
+    "id": 61,
+    "group": "Editor tools",
+    "title": "Insert the current date",
+    "status": "implemented"
+  },
+  {
+    "id": 62,
+    "group": "Editor tools",
+    "title": "Insert an editorial callout",
+    "status": "implemented"
+  },
+  {
+    "id": 63,
+    "group": "Editor tools",
+    "title": "Insert an abstract section",
+    "status": "implemented"
+  },
+  {
+    "id": 64,
+    "group": "Editor tools",
+    "title": "Find text within the editor",
+    "status": "implemented"
+  },
+  {
+    "id": 65,
+    "group": "Editor tools",
+    "title": "Replace all matching text with undo support",
+    "status": "implemented"
+  },
+  {
+    "id": 66,
+    "group": "Editor tools",
+    "title": "Insert text without imported formatting",
+    "status": "implemented"
+  },
+  {
+    "id": 67,
+    "group": "Editor tools",
+    "title": "Display live character counts",
+    "status": "implemented"
+  },
+  {
+    "id": 68,
+    "group": "Editor tools",
+    "title": "Display live paragraph counts",
+    "status": "implemented"
+  },
+  {
+    "id": 69,
+    "group": "Editor tools",
+    "title": "Download unsaved editor content as HTML",
+    "status": "implemented"
+  },
+  {
+    "id": 70,
+    "group": "Editor tools",
+    "title": "Offer reusable document starter templates",
+    "status": "implemented"
+  },
+  {
+    "id": 71,
+    "group": "Editor structure",
+    "title": "Insert a table row after the current row",
+    "status": "implemented"
+  },
+  {
+    "id": 72,
+    "group": "Editor structure",
+    "title": "Insert a table column after the current column",
+    "status": "implemented"
+  },
+  {
+    "id": 73,
+    "group": "Editor structure",
+    "title": "Delete the selected table row",
+    "status": "implemented"
+  },
+  {
+    "id": 74,
+    "group": "Editor structure",
+    "title": "Delete the selected table column",
+    "status": "implemented"
+  },
+  {
+    "id": 75,
+    "group": "Editor structure",
+    "title": "Remove the selected image",
+    "status": "implemented"
+  },
+  {
+    "id": 76,
+    "group": "Editor structure",
+    "title": "Edit the selected image alternative text",
+    "status": "implemented"
+  },
+  {
+    "id": 77,
+    "group": "Editor structure",
+    "title": "Insert a paragraph after the selected table",
+    "status": "implemented"
+  },
+  {
+    "id": 78,
+    "group": "Editor structure",
+    "title": "Add superscript formatting",
+    "status": "implemented"
+  },
+  {
+    "id": 79,
+    "group": "Editor structure",
+    "title": "Add subscript formatting",
+    "status": "implemented"
+  },
+  {
+    "id": 80,
+    "group": "Editor structure",
+    "title": "Confirm before clearing a complete editor document",
+    "status": "implemented"
+  },
+  {
+    "id": 81,
+    "group": "Accounts and feedback",
+    "title": "List the account\u2019s active sessions",
+    "status": "implemented"
+  },
+  {
+    "id": 82,
+    "group": "Accounts and feedback",
+    "title": "Identify the current session",
+    "status": "implemented"
+  },
+  {
+    "id": 83,
+    "group": "Accounts and feedback",
+    "title": "Revoke one selected session",
+    "status": "implemented"
+  },
+  {
+    "id": 84,
+    "group": "Accounts and feedback",
+    "title": "Sign out all other sessions",
+    "status": "implemented"
+  },
+  {
+    "id": 85,
+    "group": "Accounts and feedback",
+    "title": "Clean expired account sessions during session management",
+    "status": "implemented"
+  },
+  {
+    "id": 86,
+    "group": "Accounts and feedback",
+    "title": "Submit a correction report on a published record",
+    "status": "implemented"
+  },
+  {
+    "id": 87,
+    "group": "Accounts and feedback",
+    "title": "Show correction reports to the archive owner",
+    "status": "implemented"
+  },
+  {
+    "id": 88,
+    "group": "Accounts and feedback",
+    "title": "Resolve or reopen correction reports",
+    "status": "implemented"
+  },
+  {
+    "id": 89,
+    "group": "Accounts and feedback",
+    "title": "Bound and throttle correction submissions",
+    "status": "implemented"
+  },
+  {
+    "id": 90,
+    "group": "Accounts and feedback",
+    "title": "Show a personal workspace summary",
+    "status": "implemented"
+  },
+  {
+    "id": 91,
+    "group": "Reliability and delivery",
+    "title": "Add an in-product help page",
+    "status": "implemented"
+  },
+  {
+    "id": 92,
+    "group": "Reliability and delivery",
+    "title": "Add an in-product service status page",
+    "status": "implemented"
+  },
+  {
+    "id": 93,
+    "group": "Reliability and delivery",
+    "title": "Show public archive statistics without drafts",
+    "status": "implemented"
+  },
+  {
+    "id": 94,
+    "group": "Reliability and delivery",
+    "title": "Publish an RSS feed of public records",
+    "status": "implemented"
+  },
+  {
+    "id": 95,
+    "group": "Reliability and delivery",
+    "title": "Publish a sitemap of public record URLs",
+    "status": "implemented"
+  },
+  {
+    "id": 96,
+    "group": "Reliability and delivery",
+    "title": "Attach request IDs to responses and error reports",
+    "status": "implemented"
+  },
+  {
+    "id": 97,
+    "group": "Reliability and delivery",
+    "title": "Time out stalled browser API requests with clear errors",
+    "status": "implemented"
+  },
+  {
+    "id": 98,
+    "group": "Reliability and delivery",
+    "title": "Synchronize rebuilt runtime files to root and dist automatically",
+    "status": "implemented"
+  },
+  {
+    "id": 99,
+    "group": "Reliability and delivery",
+    "title": "Validate a machine-readable 100-item release checklist",
+    "status": "implemented"
+  },
+  {
+    "id": 100,
+    "group": "Reliability and delivery",
+    "title": "Record release verification and preserve the existing GitHub deployment",
+    "status": "implemented"
+  }
+]

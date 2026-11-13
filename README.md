@@ -1,4 +1,4 @@
-# Redmont Archives
+# Redmont Archives 2.1
 
 This repository updates the existing Cloudflare Pages project for **redmontarchives.com**. Keep the current project, custom domain, DNS records and D1 binding named `DB`.
 
@@ -11,3 +11,9 @@ Editable application code and its tests are in [`source/`](source/). For develop
 Future updates should be committed to this existing repository and deployed through the same connected Cloudflare Pages project. A routine update does not require reconnecting DNS or moving the domain to a different project. The ready-upload ZIP remains an alternate download, rather than a required deployment step.
 
 Validated before this update: 20 automated tests, including automatic legacy database upgrades, publishing, password recovery, permissions and protection of source paths. The upload version was also tested in Cloudflare's local runtime.
+
+## The 100-priority update
+
+[Read the complete implemented list](PRIORITIES-100.md). New tools include advanced search, a browser-local library, reading preferences, editorial notes and tags, correction reports, session controls, RSS and sitemap feeds, and additional editor structure tools. The in-product Help page also lists all 100 priorities.
+
+Current verification: 28 automated tests and both original and extended browser workflows passed. See [release validation](source/docs/VALIDATION-2.1.md). Run `npm run release` in `source/` to test, rebuild and synchronize runtime copies automatically. The root build validates asset hashes before deploying.

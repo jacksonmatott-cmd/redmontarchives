@@ -1,18 +1,19 @@
 import {mountEditor,safeHTML} from './editor.js';
+import {enhance,workspace,advancedSearch} from './workspace.js';
 
 const main=document.getElementById('main');
 const CATEGORIES=['Government','Legislation','Business','Elections','People','Events','Organizations','Other Records'];
 const descriptions=['Administrative history, offices, officials, and government actions.','Laws, bills, amendments, and the decisions that shape Redmont.','Companies, founders, and the history of Redmont’s economy.','Candidates, campaigns, election results, and public mandates.','The people and public figures behind the record.','Milestones, community events, and moments in history.','Published information from organizations across Redmont.','Documents and historical material from across the archive.'];
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slug=value=>String(value).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const date=value=>value?new Intl.DateTimeFormat('en-US',{dateStyle:'medium'}).format(new Date(String(value).includes('T')?value:String(value).replace(' ','T')+'Z')):'—';
+const date=value=>value?(Number.isNaN(new Date(String(value)).getTime())?'Date unavailable':new Intl.DateTimeFormat('en-US',{dateStyle:'medium'}).format(new Date(String(value).includes('T')?value:String(value).replace(' ','T')+'Z'))):'—';
 const url=new URL(location.href),path=url.pathname.replace(/\/$/,'')||'/';
 let user=null,dirty=false;
 window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 async function api(path,options={}){
- const response=await fetch(path,{credentials:'same-origin',cache:'no-store',...options,headers:{'Content-Type':'application/json',...options.headers}});
+ let response;try{response=await fetch(path,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(30000),...options,headers:{'Content-Type':'application/json',...options.headers}});}catch(e){throw new Error(e.name==='TimeoutError'?'The server took too long. Your unsaved text is still in the editor.':'Could not reach the archive. Check your connection and retry.');}
  let data;try{data=await response.json();}catch{throw new Error('The server did not return a valid response. Check that the complete dist folder and its _worker.js were deployed.');}
- if(!response.ok){const error=new Error(data.error||'The request failed.');error.status=response.status;throw error;}return data;
+ if(!response.ok){const error=new Error(data.error||'The request failed.');error.status=response.status;error.message+=' (Request '+(response.headers.get('X-Request-ID')||'unavailable')+')';throw error;}return data;
 }
 const send=(path,body,method='POST')=>api(path,{method,body:JSON.stringify(body)});
 function title(value){document.title=value==='Redmont Archives'?value:value+' | Redmont Archives';}
@@ -78,20 +79,20 @@ function paginate(host,data,change){host.innerHTML=`<div class="pagination"><spa
 async function organizationPage(key){
  const data=await api('/api/organizations/'+encodeURIComponent(key)),org=data.organization,edit=data.can_edit;title(org.name);
  page(`<div class="breadcrumbs"><a href="/organizations">Organizations</a> / ${esc(org.name)}</div><div class="section-heading"><div class="page-intro"><div class="eyebrow">Organization archive${org.deleted?' · Archived':''}</div><h1>${esc(org.name)}</h1><p>${esc(org.description||'No description has been published.')}</p></div>${edit?`<a class="button primary" href="/edit?kind=page&organization=${org.id}">Create page</a>`:''}</div>${org.deleted?'<div class="notice">This organization is archived and hidden from public browsing.</div>':searchForm('Search this organization’s published pages…')}${edit?'<div class="tabs" id="org-tabs"><button data-filter="published" aria-pressed="true">Published</button><button data-filter="draft">Drafts</button><button data-filter="deleted">Trash</button><button data-filter="">All</button></div>':''}<div id="org-documents" class="document-list top-gap"></div><div id="org-pagination"></div>${org.role==='owner'?'<div id="org-settings"></div>':''}`);
- if(!org.deleted){wireSearch(main.querySelector('form'),org.slug);let filter='published',offset=0;const load=async()=>{const data=await api(`/api/organizations/${org.id}/pages?limit=30&offset=${offset}${edit?'&manage=1'+(filter?'&status='+filter:''):''}`);document.getElementById('org-documents').innerHTML=data.pages.length?data.pages.map(d=>row({...d,url:`/organizations/${org.slug}/${d.slug}`},edit)).join(''):'<div class="empty">There are no pages in this view.</div>';paginate(document.getElementById('org-pagination'),data,n=>{offset=n;return load();});};await load();main.querySelectorAll('[data-filter]').forEach(btn=>btn.onclick=()=>{filter=btn.dataset.filter;offset=0;main.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));load().catch(e=>toast(e.message));});}
+ if(!org.deleted){wireSearch(main.querySelector('form'),org.slug);let filter='published',offset=0;const load=async()=>{const data=await api(`/api/organizations/id/${org.id}/pages?limit=30&offset=${offset}${edit?'&manage=1'+(filter?'&status='+filter:''):''}`);document.getElementById('org-documents').innerHTML=data.pages.length?data.pages.map(d=>row({...d,url:`/organizations/${org.slug}/${d.slug}`},edit)).join(''):'<div class="empty">There are no pages in this view.</div>';paginate(document.getElementById('org-pagination'),data,n=>{offset=n;return load();});};await load();main.querySelectorAll('[data-filter]').forEach(btn=>btn.onclick=()=>{filter=btn.dataset.filter;offset=0;main.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));load().catch(e=>toast(e.message));});}
  if(org.role==='owner')await organizationSettings(document.getElementById('org-settings'),org);
 }
 async function organizationSettings(host,org){
  host.innerHTML=`<details><summary>Organization settings · Owner</summary><form id="org-details"><div class="field-row"><label>Name<input name="name" value="${esc(org.name)}" maxlength="100" required></label><label>URL<input value="${esc(org.slug)}" readonly></label></div><label>Description<textarea name="description" maxlength="2000" rows="3">${esc(org.description||'')}</textarea></label><button class="small">Save details</button><span class="form-error" role="alert"></span></form><h3 class="top-gap">Team permissions</h3><p class="muted"><small>Owners manage settings and team access. Editors create, publish, edit and restore pages. Viewers can read public pages; drafts stay private.</small></p><form id="member-form"><div class="field-row"><label>Existing username<input name="username" required maxlength="30"></label><label>Role<select name="role"><option value="editor">Editor</option><option value="viewer">Viewer</option></select></label></div><button class="small">Add or update member</button><span class="form-error" role="alert"></span></form><div id="members"></div><h3 class="top-gap">Audit history</h3><div id="org-audit"></div><div class="actions"><button class="danger small" id="archive-org">${org.deleted?'Restore organization':'Archive organization'}</button></div></details>`;
- host.querySelector('#org-details').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;try{await send('/api/organizations/'+org.id,Object.fromEntries(new FormData(form)),'PUT');toast('Organization details saved.');}catch(e){form.querySelector('.form-error').textContent=e.message;}};
- const loadMembers=async()=>{const data=await api(`/api/organizations/${org.id}/members`);host.querySelector('#members').innerHTML=data.members.length?data.members.map(m=>`<div class="member-row"><span>${esc(m.username)} <span class="badge">${esc(m.role)}</span></span><button class="small secondary" data-remove="${esc(m.username)}">Remove</button></div>`).join(''):'<p class="muted">Only the owner currently has team access.</p>';host.querySelectorAll('[data-remove]').forEach(btn=>btn.onclick=async()=>{try{await send(`/api/organizations/${org.id}/members`,{username:btn.dataset.remove},'DELETE');await loadMembers();toast('Member removed.');}catch(e){toast(e.message);}});};await loadMembers();
- host.querySelector('#member-form').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;try{await send(`/api/organizations/${org.id}/members`,Object.fromEntries(new FormData(form)));form.reset();await loadMembers();toast('Team permissions updated.');}catch(e){form.querySelector('.form-error').textContent=e.message;}};
- await auditList(host.querySelector('#org-audit'),`/api/organizations/${org.id}/audit`);
- host.querySelector('#archive-org').onclick=async()=>{if(!confirm(org.deleted?'Restore this organization and its published pages?':'Archive this organization? Its pages will disappear from public browsing. You can restore it from your account.'))return;try{await send('/api/organizations/'+org.id,{deleted:!org.deleted},'PUT');location.reload();}catch(e){toast(e.message);}};
+ host.querySelector('#org-details').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;try{await send('/api/organizations/id/'+org.id,Object.fromEntries(new FormData(form)),'PUT');toast('Organization details saved.');}catch(e){form.querySelector('.form-error').textContent=e.message;}};
+ const loadMembers=async()=>{const data=await api(`/api/organizations/id/${org.id}/members`);host.querySelector('#members').innerHTML=data.members.length?data.members.map(m=>`<div class="member-row"><span>${esc(m.username)} <span class="badge">${esc(m.role)}</span></span><button class="small secondary" data-remove="${esc(m.username)}">Remove</button></div>`).join(''):'<p class="muted">Only the owner currently has team access.</p>';host.querySelectorAll('[data-remove]').forEach(btn=>btn.onclick=async()=>{try{await send(`/api/organizations/id/${org.id}/members`,{username:btn.dataset.remove},'DELETE');await loadMembers();toast('Member removed.');}catch(e){toast(e.message);}});};await loadMembers();
+ host.querySelector('#member-form').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;try{await send(`/api/organizations/id/${org.id}/members`,Object.fromEntries(new FormData(form)));form.reset();await loadMembers();toast('Team permissions updated.');}catch(e){form.querySelector('.form-error').textContent=e.message;}};
+ await auditList(host.querySelector('#org-audit'),`/api/organizations/id/${org.id}/audit`);
+ host.querySelector('#archive-org').onclick=async()=>{if(!confirm(org.deleted?'Restore this organization and its published pages?':'Archive this organization? Its pages will disappear from public browsing. You can restore it from your account.'))return;try{await send('/api/organizations/id/'+org.id,{deleted:!org.deleted},'PUT');location.reload();}catch(e){toast(e.message);}};
 }
 async function auditList(host,path){const data=await api(path);host.innerHTML=data.events.length?data.events.map(e=>`<div class="audit-row">${esc(e.action.replace(/_/g,' '))} · ${esc(e.username||'Former account')}<small>${date(e.created_at)}${e.document_id?' · Record '+e.document_id:''}</small></div>`).join(''):'<p class="muted">No changes have been recorded yet.</p>';}
 async function displayDocument(data){
- const doc=data.document,org=data.organization;title(doc.title);
+ const doc=data.document,org=data.organization;window.redmontDocument=doc;title(doc.title);
  page(`<div class="breadcrumbs"><a href="${org?'/organizations/'+esc(org.slug):'/archive/all'}">${org?esc(org.name):'Archive'}</a> / ${esc(doc.title)}</div><div class="document-heading"><div><span class="eyebrow">${esc(doc.category||org?.name||'Organization page')}</span><h1>${esc(doc.title)}</h1>${doc.status!=='published'?badge(doc.status):''}<p class="document-meta">Updated ${date(doc.updated_at)}${doc.can_edit?' · Revision '+doc.version:''}</p></div><div class="actions inline"><button class="small secondary" id="print-record">Print / PDF</button><button class="small secondary" id="copy-link">Copy link</button>${doc.can_edit?`<a class="button small primary" href="/edit?kind=${doc.kind}&id=${doc.id}">Edit record</a>`:''}</div></div><article class="paper richtext" id="record-content"></article>${doc.sources.length?'<section><h2 class="top-gap">Sources</h2>'+sourceList(doc.sources)+'</section>':''}`);
  const content=document.getElementById('record-content');content.innerHTML=safeHTML(doc.content);content.querySelectorAll('input').forEach(x=>x.disabled=true);document.getElementById('print-record').onclick=()=>window.print();document.getElementById('copy-link').onclick=()=>copy(location.href);
 }
@@ -165,7 +166,7 @@ async function editDocument(){
 }
 async function start(){
  try{
-  const session=await api('/api/me');user=session.user;
+  const session=await api('/api/me');user=session.user;window.redmontUser=user;
   if(user)document.getElementById('account-nav').innerHTML=`<a class="button small secondary" href="/account">${esc(user.username)}</a>`;
  }catch(e){if(!['/','/login','/register','/reset-password'].includes(path)){page(errorMessage(e));return;}}
  try{
@@ -177,7 +178,8 @@ async function start(){
   if(path==='/organizations')return await listOrganizations();
   if(path==='/create-organization')return await createOrganization();
   if(path==='/create-page'||path==='/edit')return await editDocument();
-  if(path==='/search')return await searchPage();
+  if(path==='/search')return await advancedSearch({api,send,page,esc,row,wireSearch,searchForm,sourceList,title,url});
+  if(['/library','/settings','/help','/status'].includes(path))return await workspace({api,send,page,esc,row,title,path,user});
   let match=path.match(/^\/archive\/([^/]+)$/);if(match)return await archive(decodeURIComponent(match[1]));
   match=path.match(/^\/records\/(\d+)$/);if(match)return await displayDocument(await api('/api/documents/record/'+match[1]));
   match=path.match(/^\/organizations\/([^/]+)\/([^/]+)$/);if(match)return await displayDocument(await api(`/api/organization-page/${encodeURIComponent(decodeURIComponent(match[1]))}/${encodeURIComponent(decodeURIComponent(match[2]))}`));
@@ -185,4 +187,5 @@ async function start(){
   page('<h1>Page not found</h1><p><a href="/">Return to the archive →</a></p>');
  }catch(e){title('Unable to open this page');page(`<div class="page-intro"><h1>Unable to open this page</h1>${errorMessage(e)}<div class="actions"><a class="button secondary" href="/">Return to archive</a><a class="button primary" href="/account">Your account</a></div></div>`);}
 }
+enhance({api,send,esc,toast,download,copy,getUser:()=>user});
 start();
